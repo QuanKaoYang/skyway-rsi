@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="lfup">
+            <video id="disp" class="vdbox" controls></video>
+        </div>
+        <div class="rtup">
+            <video id="disp" class="vdbox" controls></video>
+        </div>
+        <div class="lfdn">
+            <video id="disp" class="vdbox" controls></video>
+        </div>
+        <div class="rtdn">
+            <button onclick="startShare()">SHARE</button>
+        </div>
+    </div>
+    <script>
+        const startShare = () => {
+            const stream = navigator.mediaDevices.getDisplayMedia({ video: true, audio: true }).then( stream => {
+                // 成功時にvideo要素にカメラ映像をセットし、再生
+                const videoElm = document.getElementById('disp')
+                videoElm.srcObject = stream;
+                stream.getVideoTracks()[0].onended = ev => {
+                    stream.srcObject = null;
+                    console.log('ended')
+                }
+                videoElm.play();;
+            })
+        }
+    </script> 
+</body>
+</html>

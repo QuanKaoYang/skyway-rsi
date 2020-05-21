@@ -1,0 +1,36 @@
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+}
+
+.lfup {
+    grid-column: 1/2;
+    grid-row: 1/2;
+}
+
+.lfdw {
+    grid-column: 1/2;
+    grid-row: 2/3;
+}
+
+.rtup {
+    grid-column: 2/3;
+    grid-row: 1/2;
+}
+
+.rtdw {
+    grid-column: 2/3;
+    grid-row: 2/3;
+}
+
+.vdbox {
+    width: 99%;
+    height: 99%;
+    margin: 5px;
+}
+
+div.not {
+    visibility: hidden;
+    display: none;
+}
