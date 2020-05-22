@@ -83,6 +83,17 @@ const Peer = window.Peer;
             stream: localStream,
         });
 
+        main.on('stream', async stream => {
+            console.log(87)
+            const venId = stream.peerId.replace(mconf.prefix, '');
+            console.log(venId)
+            const newVideo = document.getElementById(venId);
+            newVideo.srcObject = stream;
+            await newVideo.play().catch(console.error);
+        });
+
+        main.on('peerLeave')
+
         // ホストから発信要請を受け取った場合
         main.on('data', async ({ src, data }) => {
             const selected = data.substr(-1);

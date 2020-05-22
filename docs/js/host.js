@@ -22,6 +22,9 @@ const Peer = window.Peer;
     const setVenue2 = document.getElementById('setVenue2');
     const setVenue3 = document.getElementById('setVenue3');
     const setLang0 = document.getElementById('setLang0');
+    const muteLang0 = document.getElementById('muteLang0');
+    let hostMuted = false;
+
     const setLang1 = document.getElementById('setLang1');
     const setLang2 = document.getElementById('setLang2');
 
@@ -82,8 +85,15 @@ const Peer = window.Peer;
         // roomに参加者が入ったとき
         // ホスト-会場
         main.on('peerJoin', peerId => {
-            console.log(peerId)
-        })
+            console.log(`Venue Joined: ${peerId}`);
+        });
+
+        main.on('peerLeave', peerId => {
+            console.log(`Venue Left: ${peerId}`);
+            const venId = peerId.replace(mconf.prefix, '');
+            const leftVideo = document.getElementById(venId);
+            leftVideo.srcObject = null;
+        });
 
         main.on('stream', async stream => {
             console.log('main stream changed')
@@ -95,12 +105,27 @@ const Peer = window.Peer;
             await newVideo.play().catch(console.error);
         });
 
-        // ip.on('stream', async stream => {
-        //     console.log('stream')
-        // })
+        ip.on('peerJoin', peerId => {
+            console.log(`Interpreter Joined: ${peerId}`);
+        });
+
+        ip.on('peerLeave', peerId => {
+            console.log(`Interpreter Left: ${peerId}`);
+        });
+
         ip.on('data', ({src, data}) => {
             console.log(data)
         })
+
+        audience.on('peerJoin', peerId => {
+            console.log(`Audience Joined: ${peerId}`);
+            const muteState = hostMuted ? 'host muted' : 'host unmute';
+            audience.send(muteState);
+        })
+
+        audience.on('peerLeave', peerId => {
+            console.log(`Audience Left: ${peerId}`);
+        });
     });
 
     setNoVenue.addEventListener('click', () => {
@@ -136,11 +161,37 @@ const Peer = window.Peer;
 
     setLang0.addEventListener('click', () => {
         audience.send('L0');
+        setLang0.classList.add('broadcasting');
+        setLang1.classList.remove('broadcasting')
+        setLang2.classList.remove('broadcasting')
+    });
+
+    muteLang0.addEventListener('click', () => {
+        if (hostMuted) {
+            localStream.getAudioTracks()[0].enabled = true;
+            muteLang0.classList.remove('muted');
+            hostMuted = false;
+            audience.send('host unmute');
+        } else {
+            localStream.getAudioTracks()[0].enabled = false;
+            muteLang0.classList.add('muted');
+            hostMuted = true;
+            audience.send('host muted');
+        }
     })
+
     setLang1.addEventListener('click', () => {
+        console.log('L1')
         audience.send('L1');
+        console.log(146)
+        setLang0.classList.remove('broadcasting');
+        setLang1.classList.add('broadcasting')
+        setLang2.classList.remove('broadcasting')
     })
     setLang2.addEventListener('click', () => {
         audience.send('L2');
+        setLang0.classList.remove('broadcasting');
+        setLang1.classList.remove('broadcasting')
+        setLang2.classList.add('broadcasting')
     })
 })();

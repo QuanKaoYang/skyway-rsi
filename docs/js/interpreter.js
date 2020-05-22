@@ -73,12 +73,6 @@ const Peer = window.Peer;
             stream: null,
         });
 
-        // 会場-オーディエンス
-        audience = window.Peer.joinRoom('audience', {
-            mode: 'sfu',
-            stream: localAudio,
-        });
-
         // 会場からの放送を受け取ったら放送欄を入れ替える
         ip.on('stream', async stream => {
             console.log('new broadcast')
@@ -98,6 +92,16 @@ const Peer = window.Peer;
 
         ip.on('data', ({src, data}) => {
             console.log(data);
+        })
+
+        // 会場-オーディエンス
+        audience = window.Peer.joinRoom('audience', {
+            mode: 'sfu',
+            stream: localAudio,
+        });
+
+        audience.on('peerJoin', () => {
+            audience.replaceStream(localAudio);
         })
     });
 

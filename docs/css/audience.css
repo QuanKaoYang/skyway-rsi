@@ -1,3 +1,7 @@
 h3.selected {
     background-color: teal;
 }
+
+h3.muted {
+    text-decoration: line-through;
+}

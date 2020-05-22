@@ -1,7 +1,7 @@
 const Peer = window.Peer;
 // const strm = window.strm;
 // 会場と言語の組み合わせ
-const vlProduction = ['ao', 'ai', 'bo', 'bi', 'co', 'ci'];
+const vlProduction = ['#ao', '#ai', '#bo', '#bi', '#co', '#ci'];
 
 (async function main(){
 
@@ -13,12 +13,16 @@ const vlProduction = ['ao', 'ai', 'bo', 'bi', 'co', 'ci'];
     // 会場とデフォルトのチャネル別のPeerIDを作成するための接尾辞
     // ハッシュ# 付きのURLを使用する予定
     let suffix;
+    let designatedPeerId;
     if (!location.hash) {
         suffix = 'ao';
-    } else if (vlProduction.indexOf(suffix) === -1) {
+        designatedPeerId = false;
+    } else if (vlProduction.indexOf(location.hash) === -1) {
         suffix = 'ao';
+        designatedPeerId = false;
     } else {
         suffix = location.hash.replace('#', '');
+        designatedPeerId = true;
     }
 
     // 会場用の変数を用意しておく
@@ -27,7 +31,7 @@ const vlProduction = ['ao', 'ai', 'bo', 'bi', 'co', 'ci'];
     let audience;
 
     const originalHeader = document.getElementById('originalH');
-    const interHeader = document.getElementById('interpreterH');
+    const interHeader = document.getElementById('interH');
     const hostHeader = document.getElementById('hostH');
     const originalAudio = document.getElementById('original');
     const interAudio = document.getElementById('interpreter');
@@ -39,10 +43,17 @@ const vlProduction = ['ao', 'ai', 'bo', 'bi', 'co', 'ci'];
     initBtn.addEventListener('click', async() => {
         // Peer接続のためのコンストラクタ
         // masterからの接頭辞 + 役割 + 接尾辞（ex shitianweidavenue1）
-        window.Peer = new Peer(`${mconf.prefix}aud${suffix}`,{
-            key: document.getElementById('apikey').value,
-            debug: 1,
-        });
+        if (designatedPeerId === undefined) {
+            window.Peer = new Peer({
+                key: document.getElementById('apikey').value,
+                debug: 1,
+            });
+        } else {
+            window.Peer = new Peer(`${mconf.prefix}aud${suffix}`, {
+                key: document.getElementById('apikey').value,
+                debug: 1,
+            });
+        }
 
         // ローカルストレージへのAPI Keyを保存しておく
         window.localStorage.setItem('myskyway', document.getElementById('apikey').value);
@@ -54,6 +65,7 @@ const vlProduction = ['ao', 'ai', 'bo', 'bi', 'co', 'ci'];
     // ホストと接続する
     connectBtn.addEventListener('click', async () => {
         if (!window.Peer.open) {
+
             alert('peer abort');
             return;
         } else {
@@ -80,7 +92,8 @@ const vlProduction = ['ao', 'ai', 'bo', 'bi', 'co', 'ci'];
         // 会場からの音・通訳からの音をそれぞれAudioのソースに設定
         audience.on('stream', async stream => {
             console.log('set audience stream')
-            const sourceId = stream.peerId.replace(mconf.prefix);
+            const sourceId = stream.peerId.replace(mconf.prefix, '');
+            console.log(sourceId);
             if (sourceId.startsWith('venue')){
                 originalAudio.srcObject = stream;
                 // originalAudio.volume = 0.7;
@@ -97,47 +110,55 @@ const vlProduction = ['ao', 'ai', 'bo', 'bi', 'co', 'ci'];
             switch (data) {
                 case 'L1':
                     if (suffix.endsWith('o')) {
-                        interAudio.suspend();
+                        interAudio.pause();
                         interHeader.classList.remove('selected');
-                        hostAudio.suspend();
+                        hostAudio.pause();
                         hostHeader.classList.remove('selected');
-                        originalAudio.resume();
+                        originalAudio.play();
                         originalHeader.classList.add('selected');
                     } else {
-                        originalAudio.suspend();
+                        originalAudio.pause();
                         originalHeader.classList.remove('selected');
-                        hostAudio.suspend();
+                        hostAudio.pause();
                         hostHeader.classList.remove('selected');
-                        interAudio.resume();
+                        interAudio.play();
                         interHeader.classList.add('selected');
                     }
                     break;
                 
                 case 'L2':
                     if (suffix.endsWith('o')) {
-                        originalAudio.suspend();
+                        originalAudio.pause();
                         originalHeader.classList.remove('selected');
-                        hostAudio.suspend();
+                        hostAudio.pause();
                         hostHeader.classList.remove('selected');
-                        interAudio.resume();
+                        interAudio.play();
                         interHeader.classList.add('selected');
                     } else {
-                        interAudio.suspend();
+                        interAudio.pause();
                         interHeader.classList.remove('selected');
-                        hostAudio.suspend();
+                        hostAudio.pause();
                         hostHeader.classList.remove('selected');
-                        originalAudio.resume();
+                        originalAudio.play();
                         originalHeader.classList.add('selected');
                     }
                     break;
             
                 case 'L0':
-                    originalAudio.suspend();
+                    originalAudio.pause();
                     originalHeader.classList.remove('selected');
-                    interAudio.suspend();
+                    interAudio.pause();
                     interHeader.classList.remove('selected');
-                    hostAudio.resume();
+                    hostAudio.play();
                     hostHeader.classList.add('selected');
+
+                case 'host muted':
+                    hostHeader.classList.add('muted')
+                    break;
+
+                case 'host unmute':
+                    hostHeader.classList.remove('muted')
+                    break;
 
                 default:
                     break;
