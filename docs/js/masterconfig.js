@@ -1,0 +1,3 @@
+const mconf = {
+    prefix: 'shitiandashen',
+}

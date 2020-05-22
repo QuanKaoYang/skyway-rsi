@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Host</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/host.css">
+    <script src="https://cdn.webrtc.ecl.ntt.com/skyway-latest.js"></script>
+</head>
+<body>
+    <div id="pass">
+        <h2>Input Keys</h2>
+        <input id="apikey" type="text" placeholder="skyway api key">
+        <button id="initBtn">OPEN</button>
+    </div>
+    <div id="contents" class="notshow container">
+        <div class="lfup">
+            <video id="venue1" class="vdbox" controls autoplay playsinline poster="./pict/vn1.png"></video>
+        </div>
+        <div class="rtup">
+            <video id="venue2" class="vdbox" controls autoplay playsinline poster="./pict/vn2.png"></video>
+        </div>
+        <div class="lfdn">
+            <video id="venue3" class="vdbox" controls autoplay playsinline poster="./pict/vn3.png"></video>
+        </div>
+        <div class="rtdn">
+            <button id="createBtn">START</button>
+        </div>
+    </div>
+    <script src="./js/masterconfig.js"></script>
+    <script src="./js/host.js"></script>
+</body>
+</html>
