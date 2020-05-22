@@ -16,7 +16,7 @@ const Peer = window.Peer;
     let localAudio;
 
     // 会場用の変数を用意しておく
-    let main;
+    // let main;
     let ip;
     let audience;
 
@@ -27,7 +27,7 @@ const Peer = window.Peer;
     // 最初の接続を行う
     initBtn.addEventListener('click', async() => {
         // Peer接続のためのコンストラクタ
-        // masterからの接頭辞 + 役割 + 接尾辞（ex shitianweidavenue1）
+        // masterからの接頭辞 + 役割 + 接尾辞（ex shitianweidainter1）
         window.Peer = new Peer(`${mconf.prefix}inter${suffix}`,{
             key: document.getElementById('apikey').value,
             debug: 1,
@@ -62,10 +62,10 @@ const Peer = window.Peer;
 
         // roomに参加する
         // ホスト-会場
-        main = window.Peer.joinRoom('mainsession', {
-            mode: 'sfu',
-            stream: null,
-        });
+        // main = window.Peer.joinRoom('mainsession', {
+        //     mode: 'sfu',
+        //     stream: null,
+        // });
 
         // 会場-通訳
         ip = window.Peer.joinRoom('interpreter', {
@@ -83,10 +83,10 @@ const Peer = window.Peer;
         ip.on('stream', async stream => {
             console.log('new broadcast')
             localVideo.srcObject = stream;
-            newVideo.playsInline = true;
+            // newVideo.playsInline = true;
             // PeerIDを属性として保存しておく
-            newVideo.setAttribute('data-peer-id', stream.peerId);
-            await newVideo.play().catch(console.error);
+            // newVideo.setAttribute('data-peer-id', stream.peerId);
+            await localVideo.play().catch(console.error);
         });
 
         // main.on('stream', async stream => {

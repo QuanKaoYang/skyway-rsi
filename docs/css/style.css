@@ -28,6 +28,10 @@ div.notshow {
     grid-column: 4/7;
 }
 
+.by1 {
+    grid-column: 1/7;
+}
+
 .by2bg1 {
     grid-column: 1/6;
 }

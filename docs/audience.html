@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audience</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/audience.css">
+    <script src="https://cdn.webrtc.ecl.ntt.com/skyway-latest.js"></script>
+</head>
+<body>
+    <div id="pass">
+        <h1>Audience's Page</h1>
+        <h2>Input Keys</h2>
+        <input id="apikey" type="text" placeholder="skyway api key">
+        <button id="initBtn">OPEN</button>
+        <button id="connectBtn" disabled>CONNECT to HOST</button>
+    </div>
+    <div id="contents" class="container notshow">
+        <div class="by3g1 seg2bg1">
+            <h3 id="originalH">ORIGINAL VOICE</h3>
+            <audio id="original" class="adbox" autoplay playsinline controls poster="./pict/vn1.png"></audio>
+        </div>
+        <div class="by3g2 seg2bg1">
+            <h3 id="interH">INTERPRETER VOICE</h3>
+            <audio id="interpreter" class="adbox" autoplay controls playsinline></audio>
+        </div>
+        <div class="by3g3 seg2bg1">
+            <h3 id="hostH" class="selected">HOST VOICE</h3>
+            <audio id="host" class="adbox" autoplay controls playsinline></audio>
+        </div>
+    </div>
+    <script src="./js/masterconfig.js"></script>
+    <script src="./js/audience.js"></script>
+</body>
+</html>

@@ -17,10 +17,13 @@ const Peer = window.Peer;
 
     const initBtn = document.getElementById('initBtn');
     const createBtn = document.getElementById('createBtn');
-    const setNoVenue = document.getElementById('setNoVenue')
-    const setVenue1 = document.getElementById('setVenue1')
-    const setVenue2 = document.getElementById('setVenue2')
-    const setVenue3 = document.getElementById('setVenue3')
+    const setNoVenue = document.getElementById('setNoVenue');
+    const setVenue1 = document.getElementById('setVenue1');
+    const setVenue2 = document.getElementById('setVenue2');
+    const setVenue3 = document.getElementById('setVenue3');
+    const setLang0 = document.getElementById('setLang0');
+    const setLang1 = document.getElementById('setLang1');
+    const setLang2 = document.getElementById('setLang2');
 
     // 最初の接続を行う
     initBtn.addEventListener('click', async() => {
@@ -73,7 +76,7 @@ const Peer = window.Peer;
         // ホスト-オーディエンス
         audience = window.Peer.joinRoom('audience', {
             mode: 'sfu',
-            stream: null,
+            stream: localStream,
         })
 
         // roomに参加者が入ったとき
@@ -130,4 +133,14 @@ const Peer = window.Peer;
         setVenue2.classList.remove('broadcasting');
         setVenue3.classList.add('broadcasting');
     });
+
+    setLang0.addEventListener('click', () => {
+        audience.send('L0');
+    })
+    setLang1.addEventListener('click', () => {
+        audience.send('L1');
+    })
+    setLang2.addEventListener('click', () => {
+        audience.send('L2');
+    })
 })();

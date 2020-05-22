@@ -54,7 +54,6 @@ const Peer = window.Peer;
             console.log('peer succeed');
         }
 
-
         // 表示領域の変更を行う
         document.getElementById('pass').classList.add('notshow');
         document.getElementById('contents').classList.remove('notshow');
@@ -90,9 +89,8 @@ const Peer = window.Peer;
             console.log(suffix === selected)
             if (suffix === selected) {
                 broadcasting = true;
+                audience.replaceStream(localAudio);
                 if (screanStream === null || screanStream === undefined) {
-                    console.log(95)
-                    ip.send('from venue1')
                     // const ls = await navigator.mediaDevices
                     // .getUserMedia({
                     //     audio: true,
@@ -100,14 +98,13 @@ const Peer = window.Peer;
                     // }).catch(console.error);
                     // ip.replaceStream(ls);
                     ip.replaceStream(localStream);
-                    ip.send('from venue1 too')
                 } else {
-                    console.log(98)
                     ip.replaceStream(screanStream);
                 }
             } else {
                 broadcasting = false;
                 ip.replaceStream(null);
+                audience.replaceStream(null);
             }
         })
 
@@ -120,7 +117,7 @@ const Peer = window.Peer;
         // 会場-オーディエンス
         audience = window.Peer.joinRoom('audience', {
             mode: 'sfu',
-            stream: localAudio,
+            stream: null,
         });
     });
 
