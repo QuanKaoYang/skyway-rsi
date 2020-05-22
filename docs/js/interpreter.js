@@ -38,20 +38,6 @@ const Peer = window.Peer;
         // ローカルストレージへのAPI Keyを保存しておく
         window.localStorage.setItem('myskyway', document.getElementById('apikey').value);
 
-        initBtn.disabled = true;
-        connectBtn.disabled = false;
-    });
-
-    // ホストと接続する
-    connectBtn.addEventListener('click', async () => {
-        if (!window.Peer.open) {
-            alert('peer abort');
-            return;
-        } else {
-            console.log('peer succeed');
-        }
-
-
         // 表示領域の変更を行う
         document.getElementById('pass').classList.add('notshow');
         document.getElementById('contents').classList.remove('notshow');
@@ -73,6 +59,17 @@ const Peer = window.Peer;
         // 自分の会場の部分をつくっていく
         localVideo.srcObject = localStream;
         await localVideo.play().catch(console.error);
+    });
+
+    // ホストと接続する
+    connectBtn.addEventListener('click', async () => {
+        console.log('to connect');
+        if (!window.Peer.open) {
+            console.log('peer abort');
+            return;
+        } else {
+            console.log('peer succeed');
+        }
         
         // roomに参加する
         // ホスト-会場

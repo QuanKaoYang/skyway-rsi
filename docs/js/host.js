@@ -23,24 +23,26 @@ const Peer = window.Peer;
             key: document.getElementById('apikey').value,
             debug: 3,
         });
-
+        
         // ローカルストレージへのAPI Keyを保存しておく
         window.localStorage.setItem('myskyway', document.getElementById('apikey').value);
+        
+        initBtn.disabled = true;
+        createBtn.disabled = false;
+    });
+
+    createBtn.addEventListener('click', async () => {
+        if (!window.Peer.open) {
+            alert('peer abort!');
+            return;
+        } else {
+            console.log('peer succeed');
+        }
 
         // 表示領域の変更を行う
         document.getElementById('pass').classList.add('notshow');
         document.getElementById('contents').classList.remove('notshow');
-    });
-
-    // roomを準備する
-    createBtn.addEventListener('click', async () => {
-        if (!window.Peer.open) {
-            console.log('peer abort!')
-            return;
-        } else {
-            console.log('peer succeed')
-        }
-
+    
         // roomを作っていく
         // ホスト-会場
         main = window.Peer.joinRoom('mainsession', {
@@ -53,9 +55,6 @@ const Peer = window.Peer;
             mode: 'sfu',
             stream: null,
         })
-
-        createBtn.innerText = 'CREATED';
-        createBtn.disabled = true;
 
         // ホスト-オーディエンス
         audience = window.Peer.joinRoom('audience', {
