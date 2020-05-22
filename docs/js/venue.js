@@ -10,18 +10,21 @@ const Peer = window.Peer;
 
     // 会場ごとにPeerIDを作成するための接尾辞
     // ハッシュ# 付きのURLを使用する予定
-    const suffix = location.hash ? location.hash.replace('#', '') : 0;
+    const suffix = location.hash ? location.hash.replace('#', '') : "1";
 
     // ビデオ参照用の変数を用意しておく
     let localStream;
     let localAudio;
+    let screanStream;
+    let screanSharing = false;
+    let broadcasting = false;
 
     // 会場用の変数を用意しておく
     let main;
     let ip;
     let audience;
 
-    const localVideo = document.getElementById(`venue${suffix}`)
+    const localVideo = document.getElementById(`venue${suffix}`);
     const initBtn = document.getElementById('initBtn');
     const connectBtn = document.getElementById('connectBtn');
     const shareScrBtn = document.getElementById('shareScrBtn');
@@ -32,7 +35,7 @@ const Peer = window.Peer;
         // masterからの接頭辞 + 役割 + 接尾辞（ex shitianweidavenue1）
         window.Peer = new Peer(`${mconf.prefix}venue${suffix}`,{
             key: document.getElementById('apikey').value,
-            debug: 3,
+            debug: 1,
         });
 
         // ローカルストレージへのAPI Keyを保存しておく
@@ -81,6 +84,33 @@ const Peer = window.Peer;
             stream: localStream,
         });
 
+        // ホストから発信要請を受け取った場合
+        main.on('data', async ({ src, data }) => {
+            const selected = data.substr(-1);
+            console.log(suffix === selected)
+            if (suffix === selected) {
+                broadcasting = true;
+                if (screanStream === null || screanStream === undefined) {
+                    console.log(95)
+                    ip.send('from venue1')
+                    // const ls = await navigator.mediaDevices
+                    // .getUserMedia({
+                    //     audio: true,
+                    //     video: true,
+                    // }).catch(console.error);
+                    // ip.replaceStream(ls);
+                    ip.replaceStream(localStream);
+                    ip.send('from venue1 too')
+                } else {
+                    console.log(98)
+                    ip.replaceStream(screanStream);
+                }
+            } else {
+                broadcasting = false;
+                ip.replaceStream(null);
+            }
+        })
+
         // 会場-通訳
         ip = window.Peer.joinRoom('interpreter', {
             mode: 'sfu',
@@ -105,13 +135,23 @@ const Peer = window.Peer;
             localVideo.srcObject = scrStream;
             await localVideo.play().then(()=> {
                 main_.replaceStream(scrStream);
-                ip_.replaceStream(scrStream)
+                screanStream = scrStream;
+                if (broadcasting) {
+                    ip_.replaceStream(scrStream);
+                }
+                // screanSharing = true;
+                // ip_.replaceStream(scrStream)
             }).catch(console.error);
             
             scrStream.getVideoTracks()[0].onended = ev => {
                 localVideo.srcObject = localStream;
-                main_.replaceStream(localStream)
-                ip_.replaceStream(localStream)
+                main_.replaceStream(localStream);
+                if (broadcasting) {
+                    ip_.replaceStream(localStream);
+                }
+                scrStream = null;
+                // screanSharing = false;
+                // ip_.replaceStream(localStream)
             };
         });
     });

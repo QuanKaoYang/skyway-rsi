@@ -12,8 +12,15 @@ const Peer = window.Peer;
     let ip;
     let audience;
 
+    // ビデオ参照用の変数を用意しておく
+    let localStream;
+
     const initBtn = document.getElementById('initBtn');
     const createBtn = document.getElementById('createBtn');
+    const setNoVenue = document.getElementById('setNoVenue')
+    const setVenue1 = document.getElementById('setVenue1')
+    const setVenue2 = document.getElementById('setVenue2')
+    const setVenue3 = document.getElementById('setVenue3')
 
     // 最初の接続を行う
     initBtn.addEventListener('click', async() => {
@@ -21,7 +28,7 @@ const Peer = window.Peer;
         // masterからの接頭辞 + 役割 + 接尾辞（ex shitianweidavenue1）
         window.Peer = new Peer(`${mconf.prefix}host`,{
             key: document.getElementById('apikey').value,
-            debug: 3,
+            debug: 1,
         });
         
         // ローカルストレージへのAPI Keyを保存しておく
@@ -42,6 +49,13 @@ const Peer = window.Peer;
         // 表示領域の変更を行う
         document.getElementById('pass').classList.add('notshow');
         document.getElementById('contents').classList.remove('notshow');
+
+        // ビデオとオーディオを取得する
+        localStream = await navigator.mediaDevices
+        .getUserMedia({
+            audio: true,
+            video: true,
+        }).catch(console.error);
     
         // roomを作っていく
         // ホスト-会場
@@ -53,7 +67,7 @@ const Peer = window.Peer;
         // ホスト-通訳
         ip = window.Peer.joinRoom('interpreter', {
             mode: 'sfu',
-            stream: null,
+            stream: localStream,
         })
 
         // ホスト-オーディエンス
@@ -69,12 +83,51 @@ const Peer = window.Peer;
         })
 
         main.on('stream', async stream => {
+            console.log('main stream changed')
             const venId = stream.peerId.replace(mconf.prefix, '');
-            document.getElementById(venId).srcObject = stream;
-            newVideo.playsInline = true;
+            const newVideo = document.getElementById(venId);
+            newVideo.srcObject = stream;
             // PeerIDを属性として保存しておく
             newVideo.setAttribute('data-peer-id', stream.peerId);
             await newVideo.play().catch(console.error);
         });
-    })
+
+        // ip.on('stream', async stream => {
+        //     console.log('stream')
+        // })
+        ip.on('data', ({src, data}) => {
+            console.log(data)
+        })
+    });
+
+    setNoVenue.addEventListener('click', () => {
+        main.send('no-venue');
+        setNoVenue.classList.add('broadcasting')
+        setVenue1.classList.remove('broadcasting');
+        setVenue2.classList.remove('broadcasting');
+        setVenue3.classList.remove('broadcasting');
+        ip.replaceStream(null);
+    });
+
+    setVenue1.addEventListener('click', () => {
+        main.send('venue1')
+        setNoVenue.classList.remove('broadcasting')
+        setVenue1.classList.add('broadcasting');
+        setVenue2.classList.remove('broadcasting');
+        setVenue3.classList.remove('broadcasting');
+    });
+    setVenue2.addEventListener('click', () => {
+        main.send('venue2');
+        setNoVenue.classList.remove('broadcasting')
+        setVenue1.classList.remove('broadcasting');
+        setVenue2.classList.add('broadcasting');
+        setVenue3.classList.remove('broadcasting');
+    });
+    setVenue3.addEventListener('click', () => {
+        main.send('venue3');
+        setNoVenue.classList.remove('broadcasting')
+        setVenue1.classList.remove('broadcasting');
+        setVenue2.classList.remove('broadcasting');
+        setVenue3.classList.add('broadcasting');
+    });
 })();

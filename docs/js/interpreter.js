@@ -8,12 +8,11 @@ const Peer = window.Peer;
         document.getElementById('apikey').value = window.localStorage.getItem('myskyway'); 
     }
 
-    // 会場ごとにPeerIDを作成するための接尾辞
+    // 通訳者ごとにPeerIDを作成するための接尾辞
     // ハッシュ# 付きのURLを使用する予定
-    const suffix = location.hash ? location.hash.replace('#', '') : 0;
+    const suffix = location.hash ? location.hash.replace('#', '') : '1';
 
     // ビデオ参照用の変数を用意しておく
-    let localStream;
     let localAudio;
 
     // 会場用の変数を用意しておく
@@ -21,67 +20,57 @@ const Peer = window.Peer;
     let ip;
     let audience;
 
-    const localVideo = document.getElementById(`venue${suffix}`)
+    const localVideo = document.getElementById('venueip')
     const initBtn = document.getElementById('initBtn');
     const connectBtn = document.getElementById('connectBtn');
-    const shareScrBtn = document.getElementById('shareScrBtn');
 
     // 最初の接続を行う
     initBtn.addEventListener('click', async() => {
         // Peer接続のためのコンストラクタ
         // masterからの接頭辞 + 役割 + 接尾辞（ex shitianweidavenue1）
-        window.Peer = new Peer(`${mconf.prefix}venue${suffix}`,{
+        window.Peer = new Peer(`${mconf.prefix}inter${suffix}`,{
             key: document.getElementById('apikey').value,
-            debug: 3,
+            debug: 1,
         });
 
         // ローカルストレージへのAPI Keyを保存しておく
         window.localStorage.setItem('myskyway', document.getElementById('apikey').value);
 
+        initBtn.disabled = true;
+        connectBtn.disabled = false;
+    });
+
+    // ホストと接続する
+    connectBtn.addEventListener('click', async () => {
+        if (!window.Peer.open) {
+            alert('peer abort');
+            return;
+        } else {
+            console.log('peer succeed');
+        }
+
         // 表示領域の変更を行う
         document.getElementById('pass').classList.add('notshow');
         document.getElementById('contents').classList.remove('notshow');
         
-        // ビデオとオーディオを取得する
-        localStream = await navigator.mediaDevices
-        .getUserMedia({
-            audio: true,
-            video: true,
-        }).catch(console.error);
-
-        // オーディオのみを取得する
+        // マイクを取得する
         localAudio = await navigator.mediaDevices
         .getUserMedia({
             audio: true,
             video: false,
         }).catch(console.error);
 
-        // 自分の会場の部分をつくっていく
-        localVideo.srcObject = localStream;
-        await localVideo.play().catch(console.error);
-    });
-
-    // ホストと接続する
-    connectBtn.addEventListener('click', async () => {
-        console.log('to connect');
-        if (!window.Peer.open) {
-            console.log('peer abort');
-            return;
-        } else {
-            console.log('peer succeed');
-        }
-        
         // roomに参加する
         // ホスト-会場
         main = window.Peer.joinRoom('mainsession', {
             mode: 'sfu',
-            stream: localStream,
+            stream: null,
         });
 
         // 会場-通訳
         ip = window.Peer.joinRoom('interpreter', {
             mode: 'sfu',
-            stream: localStream,
+            stream: null,
         });
 
         // 会場-オーディエンス
@@ -89,27 +78,29 @@ const Peer = window.Peer;
             mode: 'sfu',
             stream: localAudio,
         });
+
+        // 会場からの放送を受け取ったら放送欄を入れ替える
+        ip.on('stream', async stream => {
+            console.log('new broadcast')
+            localVideo.srcObject = stream;
+            newVideo.playsInline = true;
+            // PeerIDを属性として保存しておく
+            newVideo.setAttribute('data-peer-id', stream.peerId);
+            await newVideo.play().catch(console.error);
+        });
+
+        // main.on('stream', async stream => {
+        //     console.log('new main')
+        //     const newVideo = document.getElementById('venueip');
+        //     newVideo.srcObject = stream;
+        //     await newVideo.play().catch(console.error);
+        // });
+
+        ip.on('data', ({src, data}) => {
+            console.log(data);
+        })
     });
 
-    // スクリーン共有
-    shareScrBtn.addEventListener('click', async () => {
-        console.log('sharing')
-        const screan = navigator.mediaDevices.getDisplayMedia({ video: true, audio: true }).then( async scrStream => {
-            const main_ = main;
-            const ip_ = ip;
-            
-            // 成功時にvideo要素にカメラ映像をセットし、再生
-            localVideo.srcObject = scrStream;
-            await localVideo.play().then(()=> {
-                main_.replaceStream(scrStream);
-                ip_.replaceStream(scrStream)
-            }).catch(console.error);
-            
-            scrStream.getVideoTracks()[0].onended = ev => {
-                localVideo.srcObject = localStream;
-                main_.replaceStream(localStream)
-                ip_.replaceStream(localStream)
-            };
-        });
-    });
+
+
 })();
