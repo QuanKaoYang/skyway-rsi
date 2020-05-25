@@ -5,3 +5,7 @@ h3.selected {
 h3.muted {
     text-decoration: line-through;
 }
+
+button.selected {
+    background-color: teal;
+}

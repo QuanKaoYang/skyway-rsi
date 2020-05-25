@@ -40,7 +40,13 @@ const Peer = window.Peer;
     const connectBtn = document.getElementById('connectBtn');
 
     const setLang1Btn = document.getElementById('lang1');
-    const setLang2Btn = document.getElementById('lang2')
+    const setLang2Btn = document.getElementById('lang2');
+    const langDisp = document.getElementById('langDisp');
+
+    if (myLang === 'L2') {
+        setLang1Btn.classList.remove('selected');
+        setLang2Btn.classList.add('selected');
+    }
 
     // 最初の接続を行う
     initBtn.addEventListener('click', async() => {
@@ -116,6 +122,7 @@ const Peer = window.Peer;
                                 'L1': 'ori',
                                 'L2': 'ip',
                             }
+                            langDisp.innerText = 'Speaker: Lang1  Interpreter: Lang2'
                             if (myLang === 'L1') {
                                 listenOriLang();
                             } else {
@@ -128,6 +135,7 @@ const Peer = window.Peer;
                                 'L1': 'ip',
                                 'L2': 'ori',
                             }
+                            langDisp.innerText = 'Speaker: Lang2  Interpreter: Lang1'
                             if (myLang === 'L1') {
                                 listenIpLang();
                             } else {
@@ -192,6 +200,11 @@ const Peer = window.Peer;
 
     setLang1Btn.addEventListener('click', () => {
         myLang = 'L1';
+        setLang1Btn.classList.add('selected')
+        setLang1Btn.disabled = true;
+        setLang2Btn.classList.remove('selected');
+        setLang2Btn.disabled = false;
+        
         if (currentLang.L1 === 'ori') {
             listenOriLang();
         } else {
@@ -201,12 +214,16 @@ const Peer = window.Peer;
 
     setLang2Btn.addEventListener('click', () => {
         myLang = 'L2';
+        setLang2Btn.classList.add('selected');
+        setLang2Btn.disabled = true;
+        setLang1Btn.classList.remove('selected')
+        setLang1Btn.disabled = false;
+
         if (currentLang.L2 === 'ori') {
             listenOriLang();
         } else {
             listenIpLang();
         }
     })
-    
 
 })();
