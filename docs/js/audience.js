@@ -39,8 +39,8 @@ const Peer = window.Peer;
     const initBtn = document.getElementById('initBtn');
     const connectBtn = document.getElementById('connectBtn');
 
-    const setLang1Btn = document.getElementById('lang1');
-    const setLang2Btn = document.getElementById('lang2');
+    const setLang1Btn = document.getElementById('lang1Btn');
+    const setLang2Btn = document.getElementById('lang2Btn');
     const langDisp = document.getElementById('langDisp');
 
     if (myLang === 'L2') {
@@ -76,6 +76,8 @@ const Peer = window.Peer;
         // 表示領域の変更を行う
         document.getElementById('pass').classList.add('notshow');
         document.getElementById('contents').classList.remove('notshow');
+        setLang1Btn.innerText = `${mconf.lang1Name}`
+        setLang2Btn.innerText = `${mconf.lang2Name}`
         
         // ホスト-オーディエンス
         // データのやり取りのみ行う
@@ -98,7 +100,7 @@ const Peer = window.Peer;
             if (sourceId.startsWith('venue')){
                 originalAudio.srcObject = stream;
                 // originalAudio.volume = 0.7;
-            } else if (sourceId.startsWith('inter')){
+            } else if (sourceId.startsWith('ip')){
                 interAudio.srcObject = stream;
                 // interAudio.volume = 0.7;
             } else {
@@ -218,6 +220,7 @@ const Peer = window.Peer;
         setLang2Btn.disabled = true;
         setLang1Btn.classList.remove('selected')
         setLang1Btn.disabled = false;
+        
 
         if (currentLang.L2 === 'ori') {
             listenOriLang();

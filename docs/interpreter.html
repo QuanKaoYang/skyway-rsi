@@ -17,24 +17,26 @@
         <button id="connectBtn" disabled>CONNECT to HOST</button>
     </div>
     <div id="contents" class="container notshow">
-        <div class="by2bg1 seg2bg1">
-            <video id="mainVenue" class="vdbox" autoplay playsinline poster="./pict/vn1.png"></video>
+        <div class="by2bg1 seg3g1">
+            <video id="mainVenue" class="mainvdbox" autoplay playsinline poster="./pict/wait.png"></video>
         </div>
         <!-- <div class="by2bg2 seg2bg1" id="remotes"> -->
-        <div class="by2bg2 seg2bg1">
-            <ul id="remotes"></ul>
-        </div>
-        <div class="by3g1 seg2bg2">
+        <div class="by2bg2 seg3g1">
             <ul>
-                <li><button id="setLang1">Lang1</button></li>
-                <li><button id="setLang2">Lang2</button></li>
+                <li><button id="setLang1Btn">Lang1</button></li>
+                <li><button id="setLang2Btn">Lang2</button></li>
             </ul>
             <button id="mute">Mute</button>
-        </div>
-        <div class="by3g2 seg2bg2">
-            <textarea id="sendMsg" placeholder="message..." rows="2"></textarea>
-            <button id="sendMsgBtn">Send</button>
+
+            <hr />
+
             <pre id="msg">Message</pre> 
+            <textarea id="sendMsg" placeholder="message..." rows="3" cols="40"></textarea>
+            <button id="sendMsgBtn">Send</button>
+            
+        </div>
+        <div class="by1g1 seg3g2">
+            <ul id="remotes"></ul>
         </div>
     </div>
     <script src="./js/masterconfig.js"></script>

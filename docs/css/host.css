@@ -2,10 +2,12 @@
     background-color: teal;
 }
 
-#console {
-    background-color: dimgrey;
+pre#console {
+    background-color: lightskyblue;
+    padding: 3px;
 }
 
-#msg {
-    background-color: dimgrey;
+pre#msg {
+    background-color: lightgray;
+    padding: 3px;
 }

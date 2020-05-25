@@ -30,8 +30,8 @@ const Peer = window.Peer;
     const sendMsgBtn = document.getElementById('sendMsgBtn');
 
     const muteBtn = document.getElementById('mute');
-    const setLang1 = document.getElementById('setLang1');
-    const setLang2 = document.getElementById('setLang2');
+    const setLang1Btn = document.getElementById('setLang1Btn');
+    const setLang2Btn = document.getElementById('setLang2Btn');
 
     let ipMute = false;
 
@@ -63,6 +63,8 @@ const Peer = window.Peer;
         // 表示領域の変更を行う
         document.getElementById('pass').classList.add('notshow');
         document.getElementById('contents').classList.remove('notshow');
+        setLang1Btn.innerText = `${mconf.lang1Name}`
+        setLang2Btn.innerText = `${mconf.lang2Name}`
         
         // マイクを取得する
         localAudio = await navigator.mediaDevices
@@ -75,15 +77,21 @@ const Peer = window.Peer;
             if (ipMute) {
                 ipMute = false;
                 muteBtn.classList.remove('muted');
+                main.send({
+                    type: 'unmute',
+                })
             } else {
                 ipMute = true;
                 muteBtn.classList.add('muted');
+                main.send({
+                    type: 'mute',
+                })
             }
         });
 
-        setLang1.addEventListener('click', () => {
-            setLang1.classList.add('selectedLang');
-            setLang2.classList.remove('selectedLang');
+        setLang1Btn.addEventListener('click', () => {
+            setLang1Btn.classList.add('selectedLang');
+            setLang2Btn.classList.remove('selectedLang');
             aud.send({
                 type: 'toggle-aud-lang',
                 info: {
@@ -93,9 +101,9 @@ const Peer = window.Peer;
             });
         });
 
-        setLang2.addEventListener('click', () => {
-            setLang1.classList.remove('selectedLang');
-            setLang2.classList.add('selectedLang');
+        setLang2Btn.addEventListener('click', () => {
+            setLang1Btn.classList.remove('selectedLang');
+            setLang2Btn.classList.add('selectedLang');
             aud.send({
                 type: 'toggle-aud-lang',
                 info: {
@@ -113,32 +121,11 @@ const Peer = window.Peer;
             stream: null,
         });
 
-        // main.on('open', () => {
-        //     console.log('opened');
-        //     console.log(main.remoteStreams);
-        //     console.log(Object.values(main.remoteStreams))
-        //     for (const rs in main.remoteStreams) {
-        //         console.log(rs)
-        //         if (rs.peerId.startsWith(`venue`)) {
-        //             const newRemoteLi = document.createElement('li');
-        //             newRemoteLi.setAttribute('peerid', main.members[i]);
-        //             const newRemoteVideo = document.createElement('video');
-        //             newRemoteVideo.classList.add('minivdbox');
-        //             newRemoteVideo.srcObject = rs;
-        //             newRemoteVideo.playsInline = true;
-        //             newRemoteLi.appendChild(newRemoteVideo);
-        //             remotes.append(newRemoteVideo);
-        //         }
-        //     }
-        // })
-
         main.on('stream', async stream => {
-            console.log('stream');
-            console.log(main.remoteStreams);
-            console.log(Object.values(main.remoteStreams))
             if (stream.peerId.startsWith('venue')) {
                 const newRemoteLi = document.createElement('li');
                 newRemoteLi.id = `li-${stream.peerId}`;
+                newRemoteLi.classList.add('remotes')
                 const newRemoteVideo = document.createElement('video');
                 newRemoteVideo.classList.add('minivdbox');
                 newRemoteVideo.srcObject = stream;
@@ -148,10 +135,6 @@ const Peer = window.Peer;
                     console.log('venue selected')
                     selectMain(main, stream.peerId)
                 });
-                // newRemoteVideo.addEventListener('click', () => {
-                //     console.log('venue video selected')
-                //     selectMain(main, stream.peerId)
-                // });
                 remotes.append(newRemoteLi);
                 await newRemoteVideo.play().catch(console.error);
             }
@@ -166,10 +149,14 @@ const Peer = window.Peer;
                 console.log(`Venue Left: ${peerId}`);
                 const remoteLis = remotes.childNodes
                 for (const remoteLi of remoteLis) {
-                    if (remoteLi.peerId === peerId) {
+                    if (remoteLi.id === `li-${peerId}`) {
                         remotes.removeChild(remoteLi);
                         break;
                     }
+                }
+                if (mainRemote.getAttribute('pid') === peerId) {
+                    mainRemote.srcObject = null;
+                    mainRemote.setAttribute('pid', '');
                 }
             }
         });
@@ -201,7 +188,7 @@ const Peer = window.Peer;
             switch (data.type) {
                 // テキストチャット
                 case 'msg':
-                    msg.innerText = updateDisplayText(msgs, data.info);
+                    msg.innerText = updateDisplayText(msgs, data.info, 20);
                     break;
             
                 default:
@@ -209,9 +196,21 @@ const Peer = window.Peer;
             }
         });
 
+        sendMsg.addEventListener('keyup', ev => {
+            if (ev.keyCode === 13) {
+                const text = document.getElementById('sendMsg').value;
+                msg.innerText = updateDisplayText(msgs, text, 20);
+                ip.send({
+                    type: 'msg',
+                    info: text,
+                });
+                document.getElementById('sendMsg').value = '';
+            }
+        })
+
         sendMsgBtn.addEventListener('click', () => {
             const text = document.getElementById('sendMsg').value;
-            msg.innerText = updateDisplayText(msgs, text);
+            msg.innerText = updateDisplayText(msgs, text, 20);
             ip.send({
                 type: 'msg',
                 info: text,
@@ -233,7 +232,6 @@ const Peer = window.Peer;
 })();
 
 async function selectMain(room, info) {
-    console.log(room.remoteStreams);
     if (info === 'none') {
         room.remote.srcObject = null;
     } else {
@@ -241,6 +239,7 @@ async function selectMain(room, info) {
             if (rs.peerId === info) {
                 document.getElementById(`li-${rs.peerId}`).classList.add('selectedVideo')
                 document.getElementById('mainVenue').srcObject = rs;
+                document.getElementById('mainVenue').setAttribute('pid', info)
                 await document.getElementById('mainVenue').play().catch(console.error);
                 // break;
             } else {

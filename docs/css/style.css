@@ -8,6 +8,10 @@ div.notshow {
     grid-template-rows: 1fr 1fr 1fr 1fr;
 }
 
+.by1g1 {
+    grid-column: 1/7;
+}
+
 .by3g1 {
     grid-column: 1/3;
 }
@@ -53,6 +57,26 @@ div.notshow {
 }
 
 .seg2bg2 {
+    grid-row: 4/5;
+}
+
+.seg2cg1 {
+    grid-row: 1/2;
+}
+
+.seg2cg2 {
+    grid-row: 2/5;
+}
+
+.seg3g1 {
+    grid-row: 1/3;
+}
+
+.seg3g2 {
+    grid-row: 3/4;
+}
+
+.seg3g3 {
     grid-row: 4/5;
 }
 

@@ -1,10 +1,11 @@
-// const mconf = {
-//     prefix: 'shitiandashen',
-// }
+const mconf = {
+    lang1Name: 'Japanese',
+    lang2Name: 'Chinese',
+}
 
-function updateDisplayText(oldTexts, newText) {
+function updateDisplayText(oldTexts, newText, limit) {
     oldTexts.push(newText);
-    if (oldTexts.length >= 20) {
+    if (oldTexts.length >= limit) {
         oldTexts.shift();
     }
     return oldTexts.join('\n');

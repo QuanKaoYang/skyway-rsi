@@ -23,11 +23,11 @@ const Peer = window.Peer;
     const setVenue2 = document.getElementById('setVenue2');
     const setVenue3 = document.getElementById('setVenue3');
     
-    const setLang0 = document.getElementById('setLang0');
-    const muteLang0 = document.getElementById('muteLang0');
+    const setLang0Btn = document.getElementById('setLang0Btn');
+    const muteLang0Btn = document.getElementById('muteLang0Btn');
     let hostMuted = false;
-    const setLang1 = document.getElementById('setLang1');
-    const setLang2 = document.getElementById('setLang2');
+    const setLang1Btn = document.getElementById('setLang1Btn');
+    const setLang2Btn = document.getElementById('setLang2Btn');
 
     const statuses = [];
     const status = document.getElementById('console');
@@ -62,6 +62,8 @@ const Peer = window.Peer;
         // 表示領域の変更を行う
         document.getElementById('pass').classList.add('notshow');
         document.getElementById('contents').classList.remove('notshow');
+        setLang1Btn.innerText = `Speaker: ${mconf.lang1Name}`
+        setLang2Btn.innerText = `Speaker: ${mconf.lang2Name}`
 
         // ビデオとオーディオを取得する
         localStream = await navigator.mediaDevices
@@ -81,7 +83,7 @@ const Peer = window.Peer;
         // ビデオに関する処理は stream のイベントで処理をする
         main.on('peerJoin', peerId => {
             // console.log(`Venue Joined: ${peerId}`);
-            status.innerText = updateDisplayText(statuses, `Venue Joined: ${peerId}`);
+            status.innerText = updateDisplayText(statuses, `Venue Joined: ${peerId}`, 40);
         });
 
         // main roomにストリーム付きで参加者が入ったとき
@@ -99,12 +101,27 @@ const Peer = window.Peer;
         // main roomに参加者が入ったとき
         main.on('peerLeave', peerId => {
             console.log(`Venue Left: ${peerId}`);
-            status.innerText = updateDisplayText(statuses, `Venue Left: ${peerId}`);
+            status.innerText = updateDisplayText(statuses, `Venue Left: ${peerId}`, 40);
             const subPeerid = peerId;
             if (subPeerid.startsWith('venue')) {
                 document.getElementById(subPeerid).srcObject = null;
             }
         });
+
+        main.on('data', ({src, data}) => {
+            switch (data.type) {
+                case 'mute':
+                    status.innerText = updateDisplayText(statuses, `${src}: mute`, 40);
+                    break;
+
+                case 'unmute':
+                    status.innerText = updateDisplayText(statuses, `${src}: unmute`, 40);
+                    break;
+            
+                default:
+                    break;
+            }
+        })
 
         // ip 通訳者間　ホストも音声を送れる
         ip = window.Peer.joinRoom('interpreter', {
@@ -117,13 +134,13 @@ const Peer = window.Peer;
         // #TODO 通訳者の音声をモニターする処理
         ip.on('peerJoin', peerId => {
             console.log(`Interpreter Joined: ${peerId}`);
-            status.innerText = updateDisplayText(statuses, `Interpreter Joined: ${peerId}`);
+            status.innerText = updateDisplayText(statuses, `Interpreter Joined: ${peerId}`, 40);
         });
 
         // ip roomから通訳者が出たとき
         ip.on('peerLeave', peerId => {
             console.log(`Interpreter Left: ${peerId}`);
-            status.innerText = updateDisplayText(statuses, `Interpreter Left: ${peerId}`);
+            status.innerText = updateDisplayText(statuses, `Interpreter Left: ${peerId}`, 40);
         });
 
         // ip roomのデータチャンネル
@@ -131,7 +148,7 @@ const Peer = window.Peer;
             switch (data.type) {
                 // テキストチャット
                 case 'msg':
-                    msg.innerText = updateDisplayText(msgs, data.info);
+                    msg.innerText = updateDisplayText(msgs, data.info, 40);
                     break;
             
                 default:
@@ -139,15 +156,28 @@ const Peer = window.Peer;
             }
         });
 
+        sendMsg.addEventListener('keyup', ev => {
+            if (ev.keyCode === 13) {
+                const text = document.getElementById('sendMsg').value;
+                ip.send({
+                    type: 'msg',
+                    info: text,
+                });
+                msg.innerText = updateDisplayText(msgs, text, 20);
+                document.getElementById('sendMsg').value = '';
+            }
+        })
+
         sendMsgBtn.addEventListener('click', () => {
             const text = document.getElementById('sendMsg').value;
             ip.send({
                 type: 'msg',
                 info: text,
             });
-            msg.innerText = updateDisplayText(msgs, text);
+            msg.innerText = updateDisplayText(msgs, text, 20);
             document.getElementById('sendMsg').value = '';
-        })
+        });
+
 
         // aud 聴衆用
         // mainとipからそれぞれ音声を送り込む
@@ -161,7 +191,7 @@ const Peer = window.Peer;
         // ビデオに関する処理は stream のイベントで処理をする
         aud.on('peerJoin', peerId => {
             console.log(`Audience Joined: ${peerId}`);
-            status.innerText = updateDisplayText(statuses, `Audience Joined: ${peerId}`);
+            status.innerText = updateDisplayText(statuses, `Audience Joined: ${peerId}`, 40);
             // hostの音源がミュート状態か確認
             // my-トであれば入ってきた聴衆のホストaudioを無効化しておく
             const muteState = hostMuted ? 'mute' : 'unmute';
@@ -173,31 +203,32 @@ const Peer = window.Peer;
 
         // aud roomから聴衆が出たとき
         aud.on('peerLeave', peerId => {
-            status.innerText = updateDisplayText(statuses, `Audience Left: ${peerId}`);
+            status.innerText = updateDisplayText(statuses, `Audience Left: ${peerId}`, 40);
         });
 
         aud.on('data', ({src, data}) => {
             switch (data.type) {
                 case 'toggle-aud-lang':
+                    status.innerText = updateDisplayText(statuses, `${src} toggle Lang`, 40);
                     switch (data.info.ori) {
                         case 'L0':
-                            setLang0.classList.add('broadcasting');
-                            setLang1.classList.remove('broadcasting');
-                            setLang2.classList.remove('broadcasting');
+                            setLang0Btn.classList.add('broadcasting');
+                            setLang1Btn.classList.remove('broadcasting');
+                            setLang2Btn.classList.remove('broadcasting');
                             currentOriLang = 'L0';
                             break;
 
                         case 'L1':
-                            setLang0.classList.remove('broadcasting');
-                            setLang1.classList.add('broadcasting');
-                            setLang2.classList.remove('broadcasting');
+                            setLang0Btn.classList.remove('broadcasting');
+                            setLang1Btn.classList.add('broadcasting');
+                            setLang2Btn.classList.remove('broadcasting');
                             currentOriLang = 'L1';
                             break;
                         
                         case 'L2':
-                            setLang0.classList.remove('broadcasting');
-                            setLang1.classList.remove('broadcasting');
-                            setLang2.classList.add('broadcasting');
+                            setLang0Btn.classList.remove('broadcasting');
+                            setLang1Btn.classList.remove('broadcasting');
+                            setLang2Btn.classList.add('broadcasting');
                             currentOriLang = 'L2';
                             break;
                     
@@ -255,7 +286,7 @@ const Peer = window.Peer;
         setVenue3.classList.add('broadcasting');
     });
 
-    setLang0.addEventListener('click', () => {
+    setLang0Btn.addEventListener('click', () => {
         aud.send({
             type: 'toggle-aud-lang',
             info: {
@@ -263,15 +294,15 @@ const Peer = window.Peer;
                 ip: 'L0',
             },
         });
-        setLang0.classList.add('broadcasting');
-        setLang1.classList.remove('broadcasting')
-        setLang2.classList.remove('broadcasting')
+        setLang0Btn.classList.add('broadcasting');
+        setLang1Btn.classList.remove('broadcasting')
+        setLang2Btn.classList.remove('broadcasting')
     });
 
-    muteLang0.addEventListener('click', () => {
+    muteLang0Btn.addEventListener('click', () => {
         if (hostMuted) {
             localStream.getAudioTracks()[0].enabled = true;
-            muteLang0.classList.remove('muted');
+            muteLang0Btn.classList.remove('muted');
             hostMuted = false;
             aud.send({
                 type: 'host-mute',
@@ -279,7 +310,7 @@ const Peer = window.Peer;
             });
         } else {
             localStream.getAudioTracks()[0].enabled = false;
-            muteLang0.classList.add('muted');
+            muteLang0Btn.classList.add('muted');
             hostMuted = true;
             aud.send({
                 type: 'host-mute',
@@ -288,7 +319,7 @@ const Peer = window.Peer;
         }
     })
 
-    setLang1.addEventListener('click', () => {
+    setLang1Btn.addEventListener('click', () => {
         console.log('L1')
         aud.send({
             type: 'toggle-aud-lang',
@@ -297,11 +328,11 @@ const Peer = window.Peer;
                 ip: 'L2',
             },
         });
-        setLang0.classList.remove('broadcasting');
-        setLang1.classList.add('broadcasting')
-        setLang2.classList.remove('broadcasting')
+        setLang0Btn.classList.remove('broadcasting');
+        setLang1Btn.classList.add('broadcasting')
+        setLang2Btn.classList.remove('broadcasting')
     })
-    setLang2.addEventListener('click', () => {
+    setLang2Btn.addEventListener('click', () => {
         aud.send({
             type: 'toggle-aud-lang',
             info: {
@@ -309,9 +340,9 @@ const Peer = window.Peer;
                 ip: 'L1',
             },
         });
-        setLang0.classList.remove('broadcasting');
-        setLang1.classList.remove('broadcasting')
-        setLang2.classList.add('broadcasting')
+        setLang0Btn.classList.remove('broadcasting');
+        setLang1Btn.classList.remove('broadcasting')
+        setLang2Btn.classList.add('broadcasting')
     })
 })();
 
