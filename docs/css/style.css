@@ -62,6 +62,10 @@ div.notshow {
     margin: 5px;
 }
 
+.console {
+    background-color: lightslategray;
+}
+
 div.not {
     visibility: hidden;
     display: none;

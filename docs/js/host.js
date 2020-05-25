@@ -10,7 +10,7 @@ const Peer = window.Peer;
     // 会場用の変数を用意しておく
     let main;
     let ip;
-    let audience;
+    let aud;
 
     // ビデオ参照用の変数を用意しておく
     let localStream;
@@ -21,18 +21,24 @@ const Peer = window.Peer;
     const setVenue1 = document.getElementById('setVenue1');
     const setVenue2 = document.getElementById('setVenue2');
     const setVenue3 = document.getElementById('setVenue3');
+    
     const setLang0 = document.getElementById('setLang0');
     const muteLang0 = document.getElementById('muteLang0');
     let hostMuted = false;
-
     const setLang1 = document.getElementById('setLang1');
     const setLang2 = document.getElementById('setLang2');
+
+    const statuses = [];
+    const status = document.getElementById('console');
+    const msgs = [];
+    const msg = document.getElementById('msg')
+    const sendMsgBtn = document.getElementById('sendMsgBtn')
 
     // 最初の接続を行う
     initBtn.addEventListener('click', async() => {
         // Peer接続のためのコンストラクタ
         // masterからの接頭辞 + 役割 + 接尾辞（ex shitianweidavenue1）
-        window.Peer = new Peer(`${mconf.prefix}host`,{
+        window.Peer = new Peer(`host`,{
             key: document.getElementById('apikey').value,
             debug: 1,
         });
@@ -64,95 +70,135 @@ const Peer = window.Peer;
         }).catch(console.error);
     
         // roomを作っていく
-        // ホスト-会場
+        // man = ホスト-会場
         main = window.Peer.joinRoom('mainsession', {
             mode: 'sfu',
             stream: null,
         });
 
-        // ホスト-通訳
+        // main roomに参加者が入ったとき
+        // ビデオに関する処理は stream のイベントで処理をする
+        main.on('peerJoin', peerId => {
+            // console.log(`Venue Joined: ${peerId}`);
+            status.innerText = updateDisplayText(statuses, `Venue Joined: ${peerId}`);
+        });
+
+        // main roomにストリーム付きで参加者が入ったとき
+        main.on('stream', async stream => {
+            // console.log('main stream changed')
+            const subPeerid = stream.peerId;
+            if (subPeerid.startsWith('venue')) {
+                document.getElementById(subPeerid).srcObject = stream;
+                await document.getElementById(subPeerid).play().catch(console.error)
+                // PeerIDを属性として保存しておく
+                // newVideo.setAttribute('data-peer-id', stream.peerId);
+            }
+        });
+
+        // main roomに参加者が入ったとき
+        main.on('peerLeave', peerId => {
+            console.log(`Venue Left: ${peerId}`);
+            status.innerText = updateDisplayText(statuses, `Venue Left: ${peerId}`);
+            const subPeerid = peerId;
+            if (subPeerid.startsWith('venue')) {
+                document.getElementById(subPeerid).srcObject = null;
+            }
+        });
+
+        // ip 通訳者間　ホストも音声を送れる
         ip = window.Peer.joinRoom('interpreter', {
             mode: 'sfu',
             stream: localStream,
+        });
+
+        // ip roomに通訳者が入ったとき
+        // ビデオに関する処理は stream のイベントで処理をする
+        // #TODO 通訳者の音声をモニターする処理
+        ip.on('peerJoin', peerId => {
+            console.log(`Interpreter Joined: ${peerId}`);
+            status.innerText = updateDisplayText(statuses, `Interpreter Joined: ${peerId}`);
+        });
+
+        // ip roomから通訳者が出たとき
+        ip.on('peerLeave', peerId => {
+            console.log(`Interpreter Left: ${peerId}`);
+            status.innerText = updateDisplayText(statuses, `Interpreter Left: ${peerId}`);
+        });
+
+        // ip roomでのテキストチャット
+        ip.on('data', ({src, data}) => {
+            msg.innerText = updateDisplayText(msgs, data);
         })
 
-        // ホスト-オーディエンス
-        audience = window.Peer.joinRoom('audience', {
+        sendMsgBtn.addEventListener('click', () => {
+            const text = document.getElementById('sendMsg').value;
+            ip.send(text);
+            msg.innerText = updateDisplayText(msgs, text);
+            document.getElementById('sendMsg').value = '';
+        })
+
+        // aud 聴衆用
+        // mainとipからそれぞれ音声を送り込む
+        // hostからも一応は送れるようにしておく
+        aud = window.Peer.joinRoom('audience', {
             mode: 'sfu',
             stream: localStream,
         })
 
-        // roomに参加者が入ったとき
-        // ホスト-会場
-        main.on('peerJoin', peerId => {
-            console.log(`Venue Joined: ${peerId}`);
-        });
-
-        main.on('peerLeave', peerId => {
-            console.log(`Venue Left: ${peerId}`);
-            const venId = peerId.replace(mconf.prefix, '');
-            const leftVideo = document.getElementById(venId);
-            leftVideo.srcObject = null;
-        });
-
-        main.on('stream', async stream => {
-            console.log('main stream changed')
-            const venId = stream.peerId.replace(mconf.prefix, '');
-            const newVideo = document.getElementById(venId);
-            newVideo.srcObject = stream;
-            // PeerIDを属性として保存しておく
-            newVideo.setAttribute('data-peer-id', stream.peerId);
-            await newVideo.play().catch(console.error);
-        });
-
-        ip.on('peerJoin', peerId => {
-            console.log(`Interpreter Joined: ${peerId}`);
-        });
-
-        ip.on('peerLeave', peerId => {
-            console.log(`Interpreter Left: ${peerId}`);
-        });
-
-        ip.on('data', ({src, data}) => {
-            console.log(data)
-        })
-
-        audience.on('peerJoin', peerId => {
+        // aud roomに参加者が入ったとき
+        // ビデオに関する処理は stream のイベントで処理をする
+        aud.on('peerJoin', peerId => {
             console.log(`Audience Joined: ${peerId}`);
+            status.innerText = updateDisplayText(statuses, `Audience Joined: ${peerId}`);
+            // hostの音源がミュート状態か確認
+            // my-トであれば入ってきた聴衆のホストaudioを無効化しておく
             const muteState = hostMuted ? 'host muted' : 'host unmute';
-            audience.send(muteState);
+            aud.send(muteState);
         })
 
-        audience.on('peerLeave', peerId => {
-            console.log(`Audience Left: ${peerId}`);
+        // aud roomから聴衆が出たとき
+        aud.on('peerLeave', peerId => {
+            status.innerText = updateDisplayText(statuses, `Audience Left: ${peerId}`);
         });
     });
 
     setNoVenue.addEventListener('click', () => {
-        main.send('no-venue');
+        main.send({
+            type: 'all-main',
+            info: 'none',
+        });
         setNoVenue.classList.add('broadcasting')
         setVenue1.classList.remove('broadcasting');
         setVenue2.classList.remove('broadcasting');
         setVenue3.classList.remove('broadcasting');
-        ip.replaceStream(null);
+        // ip.replaceStream(null);
     });
 
     setVenue1.addEventListener('click', () => {
-        main.send('venue1')
+        main.send({
+            type: 'change-main',
+            info: 'venue1',
+        })
         setNoVenue.classList.remove('broadcasting')
         setVenue1.classList.add('broadcasting');
         setVenue2.classList.remove('broadcasting');
         setVenue3.classList.remove('broadcasting');
     });
     setVenue2.addEventListener('click', () => {
-        main.send('venue2');
+        main.send({
+            type: 'change-main',
+            info: 'venue2',
+        })
         setNoVenue.classList.remove('broadcasting')
         setVenue1.classList.remove('broadcasting');
         setVenue2.classList.add('broadcasting');
         setVenue3.classList.remove('broadcasting');
     });
     setVenue3.addEventListener('click', () => {
-        main.send('venue3');
+        main.send({
+            type: 'change-main',
+            info: 'venue3',
+        });
         setNoVenue.classList.remove('broadcasting')
         setVenue1.classList.remove('broadcasting');
         setVenue2.classList.remove('broadcasting');
@@ -160,7 +206,7 @@ const Peer = window.Peer;
     });
 
     setLang0.addEventListener('click', () => {
-        audience.send('L0');
+        aud.send('L0');
         setLang0.classList.add('broadcasting');
         setLang1.classList.remove('broadcasting')
         setLang2.classList.remove('broadcasting')
@@ -171,27 +217,35 @@ const Peer = window.Peer;
             localStream.getAudioTracks()[0].enabled = true;
             muteLang0.classList.remove('muted');
             hostMuted = false;
-            audience.send('host unmute');
+            aud.send('host unmute');
         } else {
             localStream.getAudioTracks()[0].enabled = false;
             muteLang0.classList.add('muted');
             hostMuted = true;
-            audience.send('host muted');
+            aud.send('host muted');
         }
     })
 
     setLang1.addEventListener('click', () => {
         console.log('L1')
-        audience.send('L1');
+        aud.send('L1');
         console.log(146)
         setLang0.classList.remove('broadcasting');
         setLang1.classList.add('broadcasting')
         setLang2.classList.remove('broadcasting')
     })
     setLang2.addEventListener('click', () => {
-        audience.send('L2');
+        aud.send('L2');
         setLang0.classList.remove('broadcasting');
         setLang1.classList.remove('broadcasting')
         setLang2.classList.add('broadcasting')
     })
 })();
+
+// function updateDisplayText(oldTexts, newText) {
+//     oldTexts.push(newText);
+//     if (oldTexts.length >= 20) {
+//         oldTexts.shift();
+//     }
+//     return oldTexts.join('\n');
+// }

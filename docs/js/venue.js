@@ -22,7 +22,7 @@ const Peer = window.Peer;
     // 会場用の変数を用意しておく
     let main;
     let ip;
-    let audience;
+    let aud;
 
     const localVideo = document.getElementById(`venue${suffix}`);
     const initBtn = document.getElementById('initBtn');
@@ -33,7 +33,7 @@ const Peer = window.Peer;
     initBtn.addEventListener('click', async() => {
         // Peer接続のためのコンストラクタ
         // masterからの接頭辞 + 役割 + 接尾辞（ex shitianweidavenue1）
-        window.Peer = new Peer(`${mconf.prefix}venue${suffix}`,{
+        window.Peer = new Peer(`venue${suffix}`,{
             key: document.getElementById('apikey').value,
             debug: 1,
         });
@@ -84,51 +84,52 @@ const Peer = window.Peer;
         });
 
         main.on('stream', async stream => {
-            console.log(87)
-            const venId = stream.peerId.replace(mconf.prefix, '');
-            console.log(venId)
-            const newVideo = document.getElementById(venId);
-            newVideo.srcObject = stream;
-            await newVideo.play().catch(console.error);
+            const venId = stream.peerId;
+            document.getElementById(venId).srcObject = stream;
+            await document.getElementById(venId).play().catch(console.error);
         });
 
-        main.on('peerLeave')
-
-        // ホストから発信要請を受け取った場合
-        main.on('data', async ({ src, data }) => {
-            const selected = data.substr(-1);
-            console.log(suffix === selected)
-            if (suffix === selected) {
-                broadcasting = true;
-                audience.replaceStream(localAudio);
-                if (screanStream === null || screanStream === undefined) {
-                    // const ls = await navigator.mediaDevices
-                    // .getUserMedia({
-                    //     audio: true,
-                    //     video: true,
-                    // }).catch(console.error);
-                    // ip.replaceStream(ls);
-                    ip.replaceStream(localStream);
-                } else {
-                    ip.replaceStream(screanStream);
-                }
-            } else {
-                broadcasting = false;
-                ip.replaceStream(null);
-                audience.replaceStream(null);
+        main.on('peerLeave', peerId => {
+            console.log(`Venue Left: ${peerId}`);
+            if (peerId.startsWith('venue')) {
+                document.getElementById(peerId).srcObject = null;
             }
         })
 
+        // ホストからのデータチャンネル
+        main.on('data', async ({ src, data }) => {
+            // 配信要請関連
+            // 自会場がメインとして配信された場合以外はMuteにする
+            switch (data.type) {
+                case 'all-main':
+                    localStream.getAudioTracks()[0].enabled = true;
+                    break;
+
+                case 'change-main':
+                    const selected = data.info.substr(-1);
+                    if (suffix === selected) {
+                        localStream.getAudioTracks()[0].enabled = true;
+                    } else {
+                        localStream.getAudioTracks()[0].enabled = false;
+                    }
+                    break;
+            
+                default:
+                    break;
+            }
+            console.log(suffix === selected)
+        })
+
         // 会場-通訳
-        ip = window.Peer.joinRoom('interpreter', {
-            mode: 'sfu',
-            stream: localStream,
-        });
+        // ip = window.Peer.joinRoom('interpreter', {
+        //     mode: 'sfu',
+        //     stream: localStream,
+        // });
 
         // 会場-オーディエンス
-        audience = window.Peer.joinRoom('audience', {
+        aud = window.Peer.joinRoom('audience', {
             mode: 'sfu',
-            stream: null,
+            stream: localAudio,
         });
     });
 

@@ -28,7 +28,7 @@ const vlProduction = ['#ao', '#ai', '#bo', '#bi', '#co', '#ci'];
     // 会場用の変数を用意しておく
     let main;
     let ip;
-    let audience;
+    let aud;
 
     const originalHeader = document.getElementById('originalH');
     const interHeader = document.getElementById('interH');
@@ -49,7 +49,7 @@ const vlProduction = ['#ao', '#ai', '#bo', '#bi', '#co', '#ci'];
                 debug: 1,
             });
         } else {
-            window.Peer = new Peer(`${mconf.prefix}aud${suffix}`, {
+            window.Peer = new Peer(`aud${suffix}`, {
                 key: document.getElementById('apikey').value,
                 debug: 1,
             });
@@ -84,16 +84,16 @@ const vlProduction = ['#ao', '#ai', '#bo', '#bi', '#co', '#ci'];
         // });
 
         // 会場&通訳-オーディエンス
-        audience = window.Peer.joinRoom('audience', {
+        // オーディエンスからは配信する内容がないので、受信専用としてstreamはnull
+        aud = window.Peer.joinRoom('audience', {
             mode: 'sfu',
             stream: null,
         });
 
         // 会場からの音・通訳からの音をそれぞれAudioのソースに設定
-        audience.on('stream', async stream => {
+        aud.on('stream', async stream => {
             console.log('set audience stream')
-            const sourceId = stream.peerId.replace(mconf.prefix, '');
-            console.log(sourceId);
+            const sourceId = stream.peerId;
             if (sourceId.startsWith('venue')){
                 originalAudio.srcObject = stream;
                 // originalAudio.volume = 0.7;
@@ -105,8 +105,7 @@ const vlProduction = ['#ao', '#ai', '#bo', '#bi', '#co', '#ci'];
             }
         });
 
-        audience.on('data', ({ src, data }) => {
-            console.log(data);
+        aud.on('data', ({ src, data }) => {
             switch (data) {
                 case 'L1':
                     if (suffix.endsWith('o')) {

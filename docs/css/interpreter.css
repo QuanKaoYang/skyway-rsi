@@ -1,0 +1,9 @@
+.minivdbox {
+    width: 320px;
+    height: 180px;
+    margin: 5px;
+}
+
+.selectedVideo {
+    background-color: teal;
+}
