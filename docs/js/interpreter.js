@@ -74,14 +74,18 @@ const Peer = window.Peer;
         }).catch(console.error);
 
         muteBtn.addEventListener('click', () => {
+            // ミュートがON => ミュート解除
             if (ipMute) {
                 ipMute = false;
+                localAudio.getAudioTracks()[0].enabled = true;
                 muteBtn.classList.remove('muted');
                 main.send({
                     type: 'unmute',
                 })
+            // ミュートがOFF => ミュート
             } else {
                 ipMute = true;
+                localAudio.getAudioTracks()[0].enabled = false;
                 muteBtn.classList.add('muted');
                 main.send({
                     type: 'mute',
@@ -226,6 +230,45 @@ const Peer = window.Peer;
 
         aud.on('peerJoin', () => {
             aud.replaceStream(localAudio);
+        })
+
+        aud.on('data', ({src, data}) => {
+            switch (data.type) {
+               case 'toggle-aud-lang':
+                    switch (data.info.ori) {
+                        case 'L0':
+                            ipMute = true;
+                            localAudio.getAudioTracks()[0].enabled = false;
+                            muteBtn.classList.add('muted');
+                            msg.innerText = updateDisplayText(msgs, '@host speaking', 20);
+                            break;
+
+                        case 'L1':
+                            ipMute = false;
+                            localAudio.getAudioTracks()[0].enabled = true;
+                            muteBtn.classList.remove('muted');
+                            setLang1Btn.classList.remove('selectedLang');
+                            setLang2Btn.classList.add('selectedLang');
+                            msg.innerText = updateDisplayText(msgs, 'lang toggled by @host', 20);
+                            break;
+                        
+                        case 'L2':
+                            ipMute = false;
+                            localAudio.getAudioTracks()[0].enabled = true;
+                            muteBtn.classList.remove('muted');
+                            setLang1Btn.classList.add('selectedLang');
+                            setLang2Btn.classList.remove('selectedLang');
+                            msg.innerText = updateDisplayText(msgs, 'lang toggled by @host', 20);
+                            break;
+                    
+                        default:
+                            break;
+                    }
+                    break;
+                
+                default:
+                    break;
+            }
         })
     });
 

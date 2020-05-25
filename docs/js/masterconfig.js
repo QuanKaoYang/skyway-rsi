@@ -4,7 +4,7 @@ const mconf = {
 }
 
 function updateDisplayText(oldTexts, newText, limit) {
-    oldTexts.push(newText);
+    oldTexts.push(newText.trim());
     if (oldTexts.length >= limit) {
         oldTexts.shift();
     }
