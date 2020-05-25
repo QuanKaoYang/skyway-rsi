@@ -15,7 +15,7 @@ const Peer = window.Peer;
     let myLang;
     if (!location.hash) {
         myLang = 'L1';
-    } else if (location.hash.substr(-1) === 'L2'){
+    } else if (location.hash === '#L2'){
         myLang = 'L2';
     } else {
         myLang = 'L1'
@@ -128,7 +128,7 @@ const Peer = window.Peer;
                                 'L1': 'ip',
                                 'L2': 'ori',
                             }
-                            if (myLang === 'L2') {
+                            if (myLang === 'L1') {
                                 listenIpLang();
                             } else {
                                 listenOriLang();

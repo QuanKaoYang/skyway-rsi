@@ -39,7 +39,7 @@ const Peer = window.Peer;
     initBtn.addEventListener('click', async() => {
         // Peer接続のためのコンストラクタ
         // masterからの接頭辞 + 役割 + 接尾辞（ex shitianweidavenue1）
-        window.Peer = new Peer(`host`,{
+        window.Peer = new Peer('rsihost',{
             key: document.getElementById('apikey').value,
             debug: 1,
         });
@@ -305,8 +305,8 @@ const Peer = window.Peer;
         aud.send({
             type: 'toggle-aud-lang',
             info: {
-                ori: 'L1',
-                ip: 'L2',
+                ori: 'L2',
+                ip: 'L1',
             },
         });
         setLang0.classList.remove('broadcasting');
