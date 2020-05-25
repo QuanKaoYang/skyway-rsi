@@ -11,6 +11,7 @@ const Peer = window.Peer;
     let main;
     let ip;
     let aud;
+    let currentOriLang;
 
     // ビデオ参照用の変数を用意しておく
     let localStream;
@@ -125,14 +126,25 @@ const Peer = window.Peer;
             status.innerText = updateDisplayText(statuses, `Interpreter Left: ${peerId}`);
         });
 
-        // ip roomでのテキストチャット
+        // ip roomのデータチャンネル
         ip.on('data', ({src, data}) => {
-            msg.innerText = updateDisplayText(msgs, data);
-        })
+            switch (data.type) {
+                // テキストチャット
+                case 'msg':
+                    msg.innerText = updateDisplayText(msgs, data.info);
+                    break;
+            
+                default:
+                    break;
+            }
+        });
 
         sendMsgBtn.addEventListener('click', () => {
             const text = document.getElementById('sendMsg').value;
-            ip.send(text);
+            ip.send({
+                type: 'msg',
+                info: text,
+            });
             msg.innerText = updateDisplayText(msgs, text);
             document.getElementById('sendMsg').value = '';
         })
@@ -152,14 +164,52 @@ const Peer = window.Peer;
             status.innerText = updateDisplayText(statuses, `Audience Joined: ${peerId}`);
             // hostの音源がミュート状態か確認
             // my-トであれば入ってきた聴衆のホストaudioを無効化しておく
-            const muteState = hostMuted ? 'host muted' : 'host unmute';
-            aud.send(muteState);
+            const muteState = hostMuted ? 'mute' : 'unmute';
+            aud.send({
+                type: 'host-mute',
+                info: muteState
+            });
         })
 
         // aud roomから聴衆が出たとき
         aud.on('peerLeave', peerId => {
             status.innerText = updateDisplayText(statuses, `Audience Left: ${peerId}`);
         });
+
+        aud.on('data', ({src, data}) => {
+            switch (data.type) {
+                case 'toggle-aud-lang':
+                    switch (data.info.ori) {
+                        case 'L0':
+                            setLang0.classList.add('broadcasting');
+                            setLang1.classList.remove('broadcasting');
+                            setLang2.classList.remove('broadcasting');
+                            currentOriLang = 'L0';
+                            break;
+
+                        case 'L1':
+                            setLang0.classList.remove('broadcasting');
+                            setLang1.classList.add('broadcasting');
+                            setLang2.classList.remove('broadcasting');
+                            currentOriLang = 'L1';
+                            break;
+                        
+                        case 'L2':
+                            setLang0.classList.remove('broadcasting');
+                            setLang1.classList.remove('broadcasting');
+                            setLang2.classList.add('broadcasting');
+                            currentOriLang = 'L2';
+                            break;
+                    
+                        default:
+                            break;
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+        })
     });
 
     setNoVenue.addEventListener('click', () => {
@@ -206,7 +256,13 @@ const Peer = window.Peer;
     });
 
     setLang0.addEventListener('click', () => {
-        aud.send('L0');
+        aud.send({
+            type: 'toggle-aud-lang',
+            info: {
+                ori: 'L0',
+                ip: 'L0',
+            },
+        });
         setLang0.classList.add('broadcasting');
         setLang1.classList.remove('broadcasting')
         setLang2.classList.remove('broadcasting')
@@ -217,25 +273,42 @@ const Peer = window.Peer;
             localStream.getAudioTracks()[0].enabled = true;
             muteLang0.classList.remove('muted');
             hostMuted = false;
-            aud.send('host unmute');
+            aud.send({
+                type: 'host-mute',
+                info: 'unmute'
+            });
         } else {
             localStream.getAudioTracks()[0].enabled = false;
             muteLang0.classList.add('muted');
             hostMuted = true;
-            aud.send('host muted');
+            aud.send({
+                type: 'host-mute',
+                info: 'mute'
+            });
         }
     })
 
     setLang1.addEventListener('click', () => {
         console.log('L1')
-        aud.send('L1');
-        console.log(146)
+        aud.send({
+            type: 'toggle-aud-lang',
+            info: {
+                ori: 'L1',
+                ip: 'L2',
+            },
+        });
         setLang0.classList.remove('broadcasting');
         setLang1.classList.add('broadcasting')
         setLang2.classList.remove('broadcasting')
     })
     setLang2.addEventListener('click', () => {
-        aud.send('L2');
+        aud.send({
+            type: 'toggle-aud-lang',
+            info: {
+                ori: 'L1',
+                ip: 'L2',
+            },
+        });
         setLang0.classList.remove('broadcasting');
         setLang1.classList.remove('broadcasting')
         setLang2.classList.add('broadcasting')

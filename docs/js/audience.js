@@ -1,7 +1,7 @@
 const Peer = window.Peer;
 // const strm = window.strm;
 // 会場と言語の組み合わせ
-const vlProduction = ['#ao', '#ai', '#bo', '#bi', '#co', '#ci'];
+// const vlProduction = ['#ao', '#ai', '#bo', '#bi', '#co', '#ci'];
 
 (async function main(){
 
@@ -12,18 +12,18 @@ const vlProduction = ['#ao', '#ai', '#bo', '#bi', '#co', '#ci'];
 
     // 会場とデフォルトのチャネル別のPeerIDを作成するための接尾辞
     // ハッシュ# 付きのURLを使用する予定
-    let suffix;
-    let designatedPeerId;
+    let myLang;
     if (!location.hash) {
-        suffix = 'ao';
-        designatedPeerId = false;
-    } else if (vlProduction.indexOf(location.hash) === -1) {
-        suffix = 'ao';
-        designatedPeerId = false;
+        myLang = 'L1';
+    } else if (location.hash.substr(-1) === 'L2'){
+        myLang = 'L2';
     } else {
-        suffix = location.hash.replace('#', '');
-        designatedPeerId = true;
+        myLang = 'L1'
     }
+    let currentLang = {
+        'L1': 'ori',
+        'L2': 'ip',
+    };
 
     // 会場用の変数を用意しておく
     let main;
@@ -39,21 +39,16 @@ const vlProduction = ['#ao', '#ai', '#bo', '#bi', '#co', '#ci'];
     const initBtn = document.getElementById('initBtn');
     const connectBtn = document.getElementById('connectBtn');
 
+    const setLang1Btn = document.getElementById('lang1');
+    const setLang2Btn = document.getElementById('lang2')
+
     // 最初の接続を行う
     initBtn.addEventListener('click', async() => {
         // Peer接続のためのコンストラクタ
-        // masterからの接頭辞 + 役割 + 接尾辞（ex shitianweidavenue1）
-        if (designatedPeerId === undefined) {
-            window.Peer = new Peer({
-                key: document.getElementById('apikey').value,
-                debug: 1,
-            });
-        } else {
-            window.Peer = new Peer(`aud${suffix}`, {
-                key: document.getElementById('apikey').value,
-                debug: 1,
-            });
-        }
+        window.Peer = new Peer({
+            key: document.getElementById('apikey').value,
+            debug: 1,
+        });
 
         // ローカルストレージへのAPI Keyを保存しておく
         window.localStorage.setItem('myskyway', document.getElementById('apikey').value);
@@ -106,58 +101,47 @@ const vlProduction = ['#ao', '#ai', '#bo', '#bi', '#co', '#ci'];
         });
 
         aud.on('data', ({ src, data }) => {
-            switch (data) {
-                case 'L1':
-                    if (suffix.endsWith('o')) {
-                        interAudio.pause();
-                        interHeader.classList.remove('selected');
-                        hostAudio.pause();
-                        hostHeader.classList.remove('selected');
-                        originalAudio.play();
-                        originalHeader.classList.add('selected');
-                    } else {
-                        originalAudio.pause();
-                        originalHeader.classList.remove('selected');
-                        hostAudio.pause();
-                        hostHeader.classList.remove('selected');
-                        interAudio.play();
-                        interHeader.classList.add('selected');
-                    }
+            switch (data.type) {
+                case 'host-mute':
+                    if (data.info === 'mute') {
+                        hostHeader.classList.add('muted')
+                    } else if (data.info === 'unmute')
+                        hostHeader.classList.remove('muted')
                     break;
                 
-                case 'L2':
-                    if (suffix.endsWith('o')) {
-                        originalAudio.pause();
-                        originalHeader.classList.remove('selected');
-                        hostAudio.pause();
-                        hostHeader.classList.remove('selected');
-                        interAudio.play();
-                        interHeader.classList.add('selected');
-                    } else {
-                        interAudio.pause();
-                        interHeader.classList.remove('selected');
-                        hostAudio.pause();
-                        hostHeader.classList.remove('selected');
-                        originalAudio.play();
-                        originalHeader.classList.add('selected');
+                case 'toggle-aud-lang':
+                    switch (data.info.ori) {
+                        case 'L1':
+                            currentLang = {
+                                'L1': 'ori',
+                                'L2': 'ip',
+                            }
+                            if (myLang === 'L1') {
+                                listenOriLang();
+                            } else {
+                                listenIpLang();
+                            }
+                            break;
+
+                        case 'L2':
+                            currentLang = {
+                                'L1': 'ip',
+                                'L2': 'ori',
+                            }
+                            if (myLang === 'L2') {
+                                listenIpLang();
+                            } else {
+                                listenOriLang();
+                            }
+                            break;
+
+                        case 'L0':
+                            listenHost();
+                            listeningLang = 'L0'
+                    
+                        default:
+                            break;
                     }
-                    break;
-            
-                case 'L0':
-                    originalAudio.pause();
-                    originalHeader.classList.remove('selected');
-                    interAudio.pause();
-                    interHeader.classList.remove('selected');
-                    hostAudio.play();
-                    hostHeader.classList.add('selected');
-
-                case 'host muted':
-                    hostHeader.classList.add('muted')
-                    break;
-
-                case 'host unmute':
-                    hostHeader.classList.remove('muted')
-                    break;
 
                 default:
                     break;
@@ -175,5 +159,54 @@ const vlProduction = ['#ao', '#ai', '#bo', '#bi', '#co', '#ci'];
         //     console.log(data);
         // })
     });
+
+    const listenOriLang = () => {
+        interAudio.pause();
+        interHeader.classList.remove('selected');
+        hostAudio.pause();
+        hostHeader.classList.remove('selected');
+        
+        originalAudio.play();
+        originalHeader.classList.add('selected');
+    }
+    
+    const listenIpLang = () => {
+        hostAudio.pause();
+        hostHeader.classList.remove('selected');
+        originalAudio.pause();
+        originalHeader.classList.remove('selected');
+    
+        interAudio.play();
+        interHeader.classList.add('selected');
+    }
+    
+    const listenHost = () => {
+        originalAudio.pause();
+        originalHeader.classList.remove('selected');
+        interAudio.pause();
+        interHeader.classList.remove('selected');
+    
+        hostAudio.play();
+        hostHeader.classList.add('selected');
+    }
+
+    setLang1Btn.addEventListener('click', () => {
+        myLang = 'L1';
+        if (currentLang.L1 === 'ori') {
+            listenOriLang();
+        } else {
+            listenIpLang();
+        }
+    })
+
+    setLang2Btn.addEventListener('click', () => {
+        myLang = 'L2';
+        if (currentLang.L2 === 'ori') {
+            listenOriLang();
+        } else {
+            listenIpLang();
+        }
+    })
+    
 
 })();

@@ -27,7 +27,13 @@ const Peer = window.Peer;
 
     const msgs = [];
     const msg = document.getElementById('msg');
-    const sendMsgBtn = document.getElementById('sendMsgBtn')
+    const sendMsgBtn = document.getElementById('sendMsgBtn');
+
+    const muteBtn = document.getElementById('mute');
+    const setLang1 = document.getElementById('setLang1');
+    const setLang2 = document.getElementById('setLang2');
+
+    let ipMute = false;
 
     // 最初の接続を行う
     initBtn.addEventListener('click', async() => {
@@ -64,6 +70,40 @@ const Peer = window.Peer;
             audio: true,
             video: false,
         }).catch(console.error);
+
+        muteBtn.addEventListener('click', () => {
+            if (ipMute) {
+                ipMute = false;
+                muteBtn.classList.remove('muted');
+            } else {
+                ipMute = true;
+                muteBtn.classList.add('muted');
+            }
+        });
+
+        setLang1.addEventListener('click', () => {
+            setLang1.classList.add('selectedLang');
+            setLang2.classList.remove('selectedLang');
+            aud.send({
+                type: 'toggle-aud-lang',
+                info: {
+                    ori: 'L2',
+                    ip: 'L1',
+                },
+            });
+        });
+
+        setLang2.addEventListener('click', () => {
+            setLang1.classList.remove('selectedLang');
+            setLang2.classList.add('selectedLang');
+            aud.send({
+                type: 'toggle-aud-lang',
+                info: {
+                    ori: 'L1',
+                    ip: 'L2',
+                },
+            });
+        })
 
         // roomに参加する
         // 会場からの映像・音声を受け取るチャンネル
@@ -156,15 +196,26 @@ const Peer = window.Peer;
             stream: localAudio,
         });
 
-        // ip roomでのテキストチャット
+        // ip roomのデータチャンネル
         ip.on('data', ({src, data}) => {
-            msg.innerText = updateDisplayText(msgs, data);
-        })
+            switch (data.type) {
+                // テキストチャット
+                case 'msg':
+                    msg.innerText = updateDisplayText(msgs, data.info);
+                    break;
+            
+                default:
+                    break;
+            }
+        });
 
         sendMsgBtn.addEventListener('click', () => {
             const text = document.getElementById('sendMsg').value;
             msg.innerText = updateDisplayText(msgs, text);
-            ip.send(text);
+            ip.send({
+                type: 'msg',
+                info: text,
+            });
             document.getElementById('sendMsg').value = '';
         })
 

@@ -2,6 +2,10 @@
     background-color: teal;
 }
 
-.muted {
-    background-color: tomato;
+#console {
+    background-color: dimgrey;
+}
+
+#msg {
+    background-color: dimgrey;
 }
