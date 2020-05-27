@@ -1,9 +1,14 @@
-const Peer = window.Peer;
+// const Peer = window.Peer;
 
 (async function main() {
 
-    // ローカルストレージにapikeyが保存されていればInputボックスに自動入力
-    if (window.localStorage.getItem('myskyway') !== null) {
+    // クエリーストリングが正しければInputボックスに自動入力
+    if (location.search !== '') {
+        console.log(location.search.replace('?key=', ''))
+        key = await getSkyKey(location.search.replace('?key=', ''));
+        document.getElementById('apikey').value = key;
+    // クエリーストリングがなく、ローカルストレージにapikeyが保存されていればInputボックスに自動入力
+    } else if (window.localStorage.getItem('myskyway') !== null) {
         document.getElementById('apikey').value = window.localStorage.getItem('myskyway'); 
     }
 
