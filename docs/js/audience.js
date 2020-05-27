@@ -1,4 +1,4 @@
-// const Peer = window.Peer;
+const Peer = window.Peer;
 // const strm = window.strm;
 // 会場と言語の組み合わせ
 // const vlProduction = ['#ao', '#ai', '#bo', '#bi', '#co', '#ci'];
@@ -14,7 +14,7 @@
     } else if (window.localStorage.getItem('myskyway') !== null) {
         document.getElementById('apikey').value = window.localStorage.getItem('myskyway'); 
     }
-
+    
     // 会場とデフォルトのチャネル別のPeerIDを作成するための接尾辞
     // ハッシュ# 付きのURLを使用する予定
     let myLang;
@@ -49,8 +49,8 @@
     const langDisp = document.getElementById('langDisp');
 
     if (myLang === 'L2') {
-        setLang1Btn.classList.remove('selected');
-        setLang2Btn.classList.add('selected');
+        setLang1Btn.classList.remove('is-primary');
+        setLang2Btn.classList.add('is-primary');
     }
 
     // 最初の接続を行う

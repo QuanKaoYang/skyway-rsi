@@ -29,10 +29,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.35"
-     inkscape:cx="-599.28572"
+     inkscape:cx="-1086.4286"
      inkscape:cy="520"
      inkscape:document-units="px"
-     inkscape:current-layer="g4143"
+     inkscape:current-layer="g4145"
      showgrid="false"
      units="px"
      inkscape:window-width="1920"
@@ -118,9 +118,30 @@
   <g
      style="display:inline"
      transform="translate(0,-602.36219)"
+     id="g4145"
+     inkscape:groupmode="layer"
+     inkscape:label="レイヤー 4">
+    <text
+       transform="scale(0.9472597,1.0556767)"
+       sodipodi:linespacing="125%"
+       id="text4147"
+       y="847.46381"
+       x="33.594368"
+       style="font-style:normal;font-weight:normal;font-size:37.89038849px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:170.50674438px;font-family:'BIZ UDPGothic';-inkscape-font-specification:'BIZ UDPGothic Bold'"
+         id="tspan4149"
+         y="847.46381"
+         x="33.594368"
+         sodipodi:role="line">Venue 4</tspan></text>
+  </g>
+  <g
+     style="display:none"
+     transform="translate(0,-602.36219)"
      id="g4143"
      inkscape:groupmode="layer"
-     inkscape:label="waiting">
+     inkscape:label="waiting"
+     sodipodi:insensitive="true">
     <text
        transform="scale(0.9472597,1.0556767)"
        sodipodi:linespacing="125%"
@@ -135,7 +156,7 @@
          x="99.951187"
          sodipodi:role="line">Please</tspan><tspan
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:170.50674438px;font-family:'BIZ UDPGothic';-inkscape-font-specification:'BIZ UDPGothic Bold'"
-         y="963.16486"
+         y="963.16479"
          x="99.951187"
          sodipodi:role="line"
          id="tspan4155">Wait...</tspan></text>

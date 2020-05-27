@@ -217,23 +217,23 @@
                     status.innerText = updateDisplayText(statuses, `${src} toggle Lang`, 40);
                     switch (data.info.ori) {
                         case 'L0':
-                            setLang0Btn.classList.add('broadcasting');
-                            setLang1Btn.classList.remove('broadcasting');
-                            setLang2Btn.classList.remove('broadcasting');
+                            setLang0Btn.classList.add('is-primary');
+                            setLang1Btn.classList.remove('is-primary');
+                            setLang2Btn.classList.remove('is-primary');
                             currentOriLang = 'L0';
                             break;
 
                         case 'L1':
-                            setLang0Btn.classList.remove('broadcasting');
-                            setLang1Btn.classList.add('broadcasting');
-                            setLang2Btn.classList.remove('broadcasting');
+                            setLang0Btn.classList.remove('is-primary');
+                            setLang1Btn.classList.add('is-primary');
+                            setLang2Btn.classList.remove('is-primary');
                             currentOriLang = 'L1';
                             break;
                         
                         case 'L2':
-                            setLang0Btn.classList.remove('broadcasting');
-                            setLang1Btn.classList.remove('broadcasting');
-                            setLang2Btn.classList.add('broadcasting');
+                            setLang0Btn.classList.remove('is-primary');
+                            setLang1Btn.classList.remove('is-primary');
+                            setLang2Btn.classList.add('is-primary');
                             currentOriLang = 'L2';
                             break;
                     
@@ -253,10 +253,10 @@
             type: 'all-main',
             info: 'none',
         });
-        setNoVenue.classList.add('broadcasting')
-        setVenue1.classList.remove('broadcasting');
-        setVenue2.classList.remove('broadcasting');
-        setVenue3.classList.remove('broadcasting');
+        setNoVenue.classList.add('is-primary')
+        setVenue1.classList.remove('is-primary');
+        setVenue2.classList.remove('is-primary');
+        setVenue3.classList.remove('is-primary');
         // ip.replaceStream(null);
     });
 
@@ -265,30 +265,30 @@
             type: 'change-main',
             info: 'venue1',
         })
-        setNoVenue.classList.remove('broadcasting')
-        setVenue1.classList.add('broadcasting');
-        setVenue2.classList.remove('broadcasting');
-        setVenue3.classList.remove('broadcasting');
+        setNoVenue.classList.remove('is-primary')
+        setVenue1.classList.add('is-primary');
+        setVenue2.classList.remove('is-primary');
+        setVenue3.classList.remove('is-primary');
     });
     setVenue2.addEventListener('click', () => {
         main.send({
             type: 'change-main',
             info: 'venue2',
         })
-        setNoVenue.classList.remove('broadcasting')
-        setVenue1.classList.remove('broadcasting');
-        setVenue2.classList.add('broadcasting');
-        setVenue3.classList.remove('broadcasting');
+        setNoVenue.classList.remove('is-primary')
+        setVenue1.classList.remove('is-primary');
+        setVenue2.classList.add('is-primary');
+        setVenue3.classList.remove('is-primary');
     });
     setVenue3.addEventListener('click', () => {
         main.send({
             type: 'change-main',
             info: 'venue3',
         });
-        setNoVenue.classList.remove('broadcasting')
-        setVenue1.classList.remove('broadcasting');
-        setVenue2.classList.remove('broadcasting');
-        setVenue3.classList.add('broadcasting');
+        setNoVenue.classList.remove('is-primary')
+        setVenue1.classList.remove('is-primary');
+        setVenue2.classList.remove('is-primary');
+        setVenue3.classList.add('is-primary');
     });
 
     setLang0Btn.addEventListener('click', () => {
@@ -299,15 +299,15 @@
                 ip: 'L0',
             },
         });
-        setLang0Btn.classList.add('broadcasting');
-        setLang1Btn.classList.remove('broadcasting')
-        setLang2Btn.classList.remove('broadcasting')
+        setLang0Btn.classList.add('is-primary');
+        setLang1Btn.classList.remove('is-primary')
+        setLang2Btn.classList.remove('is-primary')
     });
 
     muteLang0Btn.addEventListener('click', () => {
         if (hostMuted) {
             localStream.getAudioTracks()[0].enabled = true;
-            muteLang0Btn.classList.remove('muted');
+            muteLang0Btn.classList.remove('is-danger');
             hostMuted = false;
             aud.send({
                 type: 'host-mute',
@@ -315,7 +315,7 @@
             });
         } else {
             localStream.getAudioTracks()[0].enabled = false;
-            muteLang0Btn.classList.add('muted');
+            muteLang0Btn.classList.add('is-danger');
             hostMuted = true;
             aud.send({
                 type: 'host-mute',
@@ -333,9 +333,9 @@
                 ip: 'L2',
             },
         });
-        setLang0Btn.classList.remove('broadcasting');
-        setLang1Btn.classList.add('broadcasting')
-        setLang2Btn.classList.remove('broadcasting')
+        setLang0Btn.classList.remove('is-primary');
+        setLang1Btn.classList.add('is-primary')
+        setLang2Btn.classList.remove('is-primary')
     })
     setLang2Btn.addEventListener('click', () => {
         aud.send({
@@ -345,8 +345,8 @@
                 ip: 'L1',
             },
         });
-        setLang0Btn.classList.remove('broadcasting');
-        setLang1Btn.classList.remove('broadcasting')
-        setLang2Btn.classList.add('broadcasting')
+        setLang0Btn.classList.remove('is-primary');
+        setLang1Btn.classList.remove('is-primary')
+        setLang2Btn.classList.add('is-primary')
     })
 })();

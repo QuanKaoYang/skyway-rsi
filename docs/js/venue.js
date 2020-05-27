@@ -31,6 +31,11 @@
     const localVideo = document.getElementById(`venue${suffix}`);
     const initBtn = document.getElementById('initBtn');
     const connectBtn = document.getElementById('connectBtn');
+
+    // const msgs = [];
+    // const msg = document.getElementById('msg');
+    // const sendMsgBtn = document.getElementById('sendMsgBtn');
+
     const shareScrBtn = document.getElementById('shareScrBtn');
 
     // 最初の接続を行う

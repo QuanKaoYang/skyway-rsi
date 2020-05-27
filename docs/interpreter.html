@@ -5,39 +5,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interpreter</title>
     <link rel="stylesheet" href="./css/style.css">
-    <link rel="stylesheet" href="./css/interpreter.css">
+    <!-- <link rel="stylesheet" href="./css/interpreter.css"> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css">
     <script src="https://cdn.webrtc.ecl.ntt.com/skyway-latest.js"></script>
 </head>
 <body>
+    <!-- ログイン画面 ログイン後にdisplay:none -->
     <div id="pass">
-        <h1>Interpreter's Page</h1>
-        <h2>Input Keys</h2>
-        <input id="apikey" type="text" placeholder="skyway api key">
-        <button id="initBtn">OPEN</button>
-        <button id="connectBtn" disabled>CONNECT to HOST</button>
+    <!-- <div id="pass" class="notshow"> -->
+        <section class="hero is-dark">
+            <div class="hero-body">
+                <h1 class="title">Interpreter's Page</h1>
+            </div>
+        </section>
+        <section class="section">
+            <div class="container">
+                <h2>Input Keys</h2>
+                <div class="columns">
+                    <div class="column is-9">
+                        <input id="apikey" type="text" placeholder="skyway api key" class="input">
+                    </div>
+                    <div class="column is-3">
+                        <button id="initBtn" class="button is-info">OPEN</button>
+                        <button id="connectBtn" class="button is-success" disabled>Connect to Host</button>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
-    <div id="contents" class="container notshow">
-        <div class="by2bg1 seg3g1">
-            <video id="mainVenue" class="mainvdbox" autoplay playsinline poster="./pict/wait.png"></video>
-        </div>
-        <!-- <div class="by2bg2 seg2bg1" id="remotes"> -->
-        <div class="by2bg2 seg3g1">
-            <ul>
-                <li><button id="setLang1Btn">Lang1</button></li>
-                <li><button id="setLang2Btn">Lang2</button></li>
-            </ul>
-            <button id="mute">Mute</button>
+    <!-- ログイン画面 ここまで -->
+    <!-- メイン画面 ログイン後に表示 -->
+    <div id="contents" class="notshow container is-fluid">
+    <!-- <div id="contents" class="container is-fluid"> -->
+        <!-- メインビデオ + コントロールのセクション -->
+        <section class="section" id="main-control">
+            <div class="columns">
+                <!-- メインビデオ -->
+                <div class="column is-10">
+                    <video id="mainVideo" class="mainVdbox"
+                        autoplay
+                        playsinline
+                        poster="./pict/wait.png"
+                    ></video>
+                </div>
+                <div class="column is-2">
+                    <ul class="horizon">
+                        <li><button class="button" id="setLang1Btn">Lang1</button></li>
+                        <li><button class="button" id="setLang2Btn">Lang2</button></li>
+                    </ul>
+                    <button class="button" id="mute">Mute</button>
 
-            <hr />
+                    <hr />
 
-            <pre id="msg">Message</pre> 
-            <textarea id="sendMsg" placeholder="message..." rows="3" cols="40"></textarea>
-            <button id="sendMsgBtn">Send</button>
-            
-        </div>
-        <div class="by1g1 seg3g2">
-            <ul id="remotes"></ul>
-        </div>
+                    <div class="content">
+                        <pre id="msg">message...</pre>
+                    </div>
+                    <div class="content">
+                        <textarea id="sendMsg" placeholder="message..." rows="3" cols="40"></textarea>
+                        <button id="sendMsgBtn" class="button is-success is-small">Send</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- メイン+コントロール　ここまで -->
+        <!-- 会場の選択 -->
+        <section class="section" id="remote-index">
+            <!-- <div class="by1g1 seg3g2"> -->
+                <ul id="remotes" class="horizon"></ul>
+            <!-- </div> -->
+        </section>
     </div>
     <script src="./js/index.js"></script>
     <script src="./js/interpreter.js"></script>

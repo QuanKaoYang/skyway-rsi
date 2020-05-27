@@ -1,8 +1,63 @@
+/* 汎用 */
 div.notshow {
     display: none;
 }
 
-.container {
+pre#console {
+    background-color: rgb(250, 135, 250);
+    padding: 3px;
+}
+
+pre#msg {
+    background-color: lightgray;
+    padding: 3px;
+}
+
+ul.horizon li{
+    display: inline;
+}
+
+/* ホスト用 */
+.vdbox {
+    width: 99%;
+    height: 99%;
+    margin: 5px;
+}
+
+/* 通訳用 1 */
+.mainVdbox {
+    width: 1280px;
+    height: 720px;
+    margin: 5px;
+}
+
+/* 通訳用 2 */
+.miniVdbox {
+    width: 240px;
+    height: 135px;
+    margin: 5px;
+}
+
+/* 通訳用 3 */
+.currentVdbox {
+    background-color: teal;
+}
+
+/* オーディエンス用 */
+h3.selected {
+    background-color: teal;
+}
+
+h3.muted {
+    text-decoration: line-through;
+}
+
+/* li.remotes {
+    float: left;
+} */
+
+
+/* .container {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr 1fr;
@@ -78,18 +133,14 @@ div.notshow {
 
 .seg3g3 {
     grid-row: 4/5;
-}
+} */
 
-.vdbox {
-    width: 99%;
-    height: 99%;
-    margin: 5px;
-}
 
-div.not {
+
+/* div.not {
     visibility: hidden;
     display: none;
-}
+} */
 
 .muted {
     background-color: tomato;

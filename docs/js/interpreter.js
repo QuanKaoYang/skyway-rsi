@@ -25,7 +25,7 @@
     let ip;
     let aud;
 
-    const mainRemote = document.getElementById('mainVenue');
+    const mainRemote = document.getElementById('mainVideo');
     const remotes = document.getElementById('remotes');
     const initBtn = document.getElementById('initBtn');
     const connectBtn = document.getElementById('connectBtn');
@@ -83,7 +83,7 @@
             if (ipMute) {
                 ipMute = false;
                 localAudio.getAudioTracks()[0].enabled = true;
-                muteBtn.classList.remove('muted');
+                muteBtn.classList.remove('is-danger');
                 main.send({
                     type: 'unmute',
                 })
@@ -91,7 +91,7 @@
             } else {
                 ipMute = true;
                 localAudio.getAudioTracks()[0].enabled = false;
-                muteBtn.classList.add('muted');
+                muteBtn.classList.add('is-danger');
                 main.send({
                     type: 'mute',
                 })
@@ -99,8 +99,8 @@
         });
 
         setLang1Btn.addEventListener('click', () => {
-            setLang1Btn.classList.add('selectedLang');
-            setLang2Btn.classList.remove('selectedLang');
+            setLang1Btn.classList.add('is-primary');
+            setLang2Btn.classList.remove('is-primary');
             aud.send({
                 type: 'toggle-aud-lang',
                 info: {
@@ -111,8 +111,8 @@
         });
 
         setLang2Btn.addEventListener('click', () => {
-            setLang1Btn.classList.remove('selectedLang');
-            setLang2Btn.classList.add('selectedLang');
+            setLang1Btn.classList.remove('is-primary');
+            setLang2Btn.classList.add('is-primary');
             aud.send({
                 type: 'toggle-aud-lang',
                 info: {
@@ -134,9 +134,9 @@
             if (stream.peerId.startsWith('venue')) {
                 const newRemoteLi = document.createElement('li');
                 newRemoteLi.id = `li-${stream.peerId}`;
-                newRemoteLi.classList.add('remotes')
+                // newRemoteLi.classList.add('remotes')
                 const newRemoteVideo = document.createElement('video');
-                newRemoteVideo.classList.add('minivdbox');
+                newRemoteVideo.classList.add('miniVdbox');
                 newRemoteVideo.srcObject = stream;
                 newRemoteVideo.playsInline = true;
                 newRemoteLi.appendChild(newRemoteVideo);
@@ -244,25 +244,25 @@
                         case 'L0':
                             ipMute = true;
                             localAudio.getAudioTracks()[0].enabled = false;
-                            muteBtn.classList.add('muted');
+                            muteBtn.classList.add('is-danger');
                             msg.innerText = updateDisplayText(msgs, '@host speaking', 20);
                             break;
 
                         case 'L1':
                             ipMute = false;
                             localAudio.getAudioTracks()[0].enabled = true;
-                            muteBtn.classList.remove('muted');
-                            setLang1Btn.classList.remove('selectedLang');
-                            setLang2Btn.classList.add('selectedLang');
+                            muteBtn.classList.remove('is-danger');
+                            setLang1Btn.classList.remove('is-primary');
+                            setLang2Btn.classList.add('is-primary');
                             msg.innerText = updateDisplayText(msgs, 'lang toggled by @host', 20);
                             break;
                         
                         case 'L2':
                             ipMute = false;
                             localAudio.getAudioTracks()[0].enabled = true;
-                            muteBtn.classList.remove('muted');
-                            setLang1Btn.classList.add('selectedLang');
-                            setLang2Btn.classList.remove('selectedLang');
+                            muteBtn.classList.remove('is-danger');
+                            setLang1Btn.classList.add('is-primary');
+                            setLang2Btn.classList.remove('is-primary');
                             msg.innerText = updateDisplayText(msgs, 'lang toggled by @host', 20);
                             break;
                     
@@ -285,13 +285,13 @@ async function selectMain(room, info) {
     } else {
         for (const rs of Object.values(room.remoteStreams)) {
             if (rs.peerId === info) {
-                document.getElementById(`li-${rs.peerId}`).classList.add('selectedVideo')
-                document.getElementById('mainVenue').srcObject = rs;
-                document.getElementById('mainVenue').setAttribute('pid', info)
-                await document.getElementById('mainVenue').play().catch(console.error);
+                document.getElementById(`li-${rs.peerId}`).classList.add('currentVdbox')
+                document.getElementById('mainVideo').srcObject = rs;
+                document.getElementById('mainVideo').setAttribute('pid', info)
+                await document.getElementById('mainVideo').play().catch(console.error);
                 // break;
             } else {
-                document.getElementById(`li-${rs.peerId}`).classList.remove('selectedVideo')
+                document.getElementById(`li-${rs.peerId}`).classList.remove('currentVdbox')
             }
         }
     }
