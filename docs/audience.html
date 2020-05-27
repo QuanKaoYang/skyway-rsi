@@ -42,22 +42,22 @@
             <!-- PCなら横 スマホなら縦 -->
             <div class="columns is-desktop">
                 <div class="column is-one-third">
-                    <h3 id="originalH">ORIGINAL VOICE</h3>
+                    <h3 id="originalH" class="voice">ORIGINAL VOICE</h3>
                     <audio id="original" class="adbox" autoplay playsinline controls poster="./pict/vn1.png"></audio>
                 </div>
                 <div class="column is-one-third">
-                    <h3 id="interH">INTERPRETER VOICE</h3>
+                    <h3 id="interH" class="voice">INTERPRETER VOICE</h3>
                     <audio id="interpreter" class="adbox" autoplay controls playsinline></audio>
                 </div>
                 <div class="column is-one-third">
-                    <h3 id="hostH" class="selected">HOST VOICE</h3>
+                    <h3 id="hostH" class="voice selected">HOST VOICE</h3>
                     <audio id="host" class="adbox" autoplay controls playsinline></audio>
                 </div>
             </div>
         </section>
         <section class="section" id="controls">
-            <div class="columns">
-                <h2 id="langDisp">Speake    r: Lang1  Interpreter: Lang2</p>
+            <div>
+                <h2 id="langDisp" class="is-size-3">Speaker: Lang1<br />  Interpreter: Lang2</h2>
                 <ul class="horizon">
                     <li><button id="lang1Btn" class="button is-primary">Lang 1:</button></li>
                     <li><button id="lang2Btn" class="button">Lang 2:</button></li>

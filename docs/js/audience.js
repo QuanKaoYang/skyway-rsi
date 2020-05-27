@@ -1,4 +1,4 @@
-const Peer = window.Peer;
+// const Peer = window.Peer;
 // const strm = window.strm;
 // 会場と言語の組み合わせ
 // const vlProduction = ['#ao', '#ai', '#bo', '#bi', '#co', '#ci'];
@@ -83,6 +83,7 @@ const Peer = window.Peer;
         document.getElementById('contents').classList.remove('notshow');
         setLang1Btn.innerText = `${mconf.lang1Name}`
         setLang2Btn.innerText = `${mconf.lang2Name}`
+        langDisp.innerHTML = `Speaker: ${mconf.lang1Name}  <br /> Interpreter: ${mconf.lang2Name}`
         
         // ホスト-オーディエンス
         // データのやり取りのみ行う
@@ -129,7 +130,7 @@ const Peer = window.Peer;
                                 'L1': 'ori',
                                 'L2': 'ip',
                             }
-                            langDisp.innerText = 'Speaker: Lang1  Interpreter: Lang2'
+                            langDisp.innerHTML = `Speaker: ${mconf.lang1Name}  <br /> Interpreter: ${mconf.lang2Name}`
                             if (myLang === 'L1') {
                                 listenOriLang();
                             } else {
@@ -142,7 +143,7 @@ const Peer = window.Peer;
                                 'L1': 'ip',
                                 'L2': 'ori',
                             }
-                            langDisp.innerText = 'Speaker: Lang2  Interpreter: Lang1'
+                            langDisp.innerHTML = `Speaker: ${mconf.lang2Name}  <br /> Interpreter: ${mconf.lang1Name}`
                             if (myLang === 'L1') {
                                 listenIpLang();
                             } else {
@@ -207,9 +208,9 @@ const Peer = window.Peer;
 
     setLang1Btn.addEventListener('click', () => {
         myLang = 'L1';
-        setLang1Btn.classList.add('selected')
+        setLang1Btn.classList.add('is-primary')
         setLang1Btn.disabled = true;
-        setLang2Btn.classList.remove('selected');
+        setLang2Btn.classList.remove('is-primary');
         setLang2Btn.disabled = false;
         
         if (currentLang.L1 === 'ori') {
@@ -221,9 +222,9 @@ const Peer = window.Peer;
 
     setLang2Btn.addEventListener('click', () => {
         myLang = 'L2';
-        setLang2Btn.classList.add('selected');
+        setLang2Btn.classList.add('is-primary');
         setLang2Btn.disabled = true;
-        setLang1Btn.classList.remove('selected')
+        setLang1Btn.classList.remove('is-primary')
         setLang1Btn.disabled = false;
         
 

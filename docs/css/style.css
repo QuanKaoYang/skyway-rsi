@@ -58,8 +58,14 @@ footer {
 }
 
 /* オーディエンス用 */
+h3.voice {
+    padding: 0.3rem;
+}
+
 h3.selected {
     background-color: teal;
+    color: white;
+    font-weight: bolder;
 }
 
 h3.muted {
