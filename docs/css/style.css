@@ -17,6 +17,20 @@ ul.horizon li{
     display: inline;
 }
 
+footer {
+    width: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1rem;
+    color: white;
+    display: inline-block;
+    position: absolute;
+    bottom: 0px;
+    background-color: black;
+    padding-top: 0.2rem;
+    padding-left: 3rem;
+    padding-bottom: 0.2rem;
+}
+
 /* ホスト用 */
 .vdbox {
     width: 99%;
