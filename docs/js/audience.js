@@ -1,8 +1,3 @@
-// const Peer = window.Peer;
-// const strm = window.strm;
-// 会場と言語の組み合わせ
-// const vlProduction = ['#ao', '#ai', '#bo', '#bi', '#co', '#ci'];
-
 (async function main(){
 
     // クエリーストリングが正しければInputボックスに自動入力
@@ -31,8 +26,8 @@
     };
 
     // 会場用の変数を用意しておく
-    let main;
-    let ip;
+    // let main;
+    // let ip;
     let aud;
 
     const originalHeader = document.getElementById('originalH');
@@ -47,6 +42,8 @@
     const setLang1Btn = document.getElementById('lang1Btn');
     const setLang2Btn = document.getElementById('lang2Btn');
     const langDisp = document.getElementById('langDisp');
+
+    const reloadBtn = document.getElementById('reloadBtn');
 
     if (myLang === 'L2') {
         setLang1Btn.classList.remove('is-primary');
@@ -71,7 +68,6 @@
     // ホストと接続する
     connectBtn.addEventListener('click', async () => {
         if (!window.Peer.open) {
-
             alert('peer abort');
             return;
         } else {
@@ -85,13 +81,6 @@
         setLang2Btn.innerText = `${mconf.lang2Name}`
         langDisp.innerHTML = `Speaker: ${mconf.lang1Name}  <br /> Interpreter: ${mconf.lang2Name}`
         
-        // ホスト-オーディエンス
-        // データのやり取りのみ行う
-        // main = window.Peer.joinRoom('mainsession', {
-        //     mode: 'sfu',
-        //     stream: null,
-        // });
-
         // 会場&通訳-オーディエンス
         // オーディエンスからは配信する内容がないので、受信専用としてstreamはnull
         aud = window.Peer.joinRoom('audience', {
@@ -105,10 +94,8 @@
             const sourceId = stream.peerId;
             if (sourceId.startsWith('venue')){
                 originalAudio.srcObject = stream;
-                // originalAudio.volume = 0.7;
             } else if (sourceId.startsWith('ip')){
                 interAudio.srcObject = stream;
-                // interAudio.volume = 0.7;
             } else {
                 hostAudio.srcObject = stream;
             }
@@ -154,6 +141,7 @@
                         case 'L0':
                             listenHost();
                             listeningLang = 'L0'
+                            break;
                     
                         default:
                             break;
@@ -163,17 +151,6 @@
                     break;
             }
         })
-
-        // main.on('stream', async stream => {
-        //     console.log('new main')
-        //     const newVideo = document.getElementById('venueip');
-        //     newVideo.srcObject = stream;
-        //     await newVideo.play().catch(console.error);
-        // });
-
-        // ip.on('data', ({src, data}) => {
-        //     console.log(data);
-        // })
     });
 
     const listenOriLang = () => {
@@ -226,13 +203,21 @@
         setLang2Btn.disabled = true;
         setLang1Btn.classList.remove('is-primary')
         setLang1Btn.disabled = false;
-        
 
         if (currentLang.L2 === 'ori') {
             listenOriLang();
         } else {
             listenIpLang();
         }
+    })
+
+    reloadBtn.addEventListener('click', () => {
+        console.log('reload');
+        aud.close();
+        aud.joinRoom('audience', {
+            mode: 'sfu',
+            stream: null,
+        });
     })
 
 })();

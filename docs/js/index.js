@@ -22,3 +22,22 @@ async function getSkyKey(key) {
         })
     })
 }
+
+async function getMediaStream(video, audio) {
+    return new Promise((resolve, reject) => {
+        navigator.mediaDevices
+            .getUserMedia({
+                video,
+                audio
+            }).then(stream => {
+                if (stream === null) {
+                    const mock = document.createElement('canvas');
+                    resolve(mock.captureStream(10));
+                } else {
+                    resolve(stream);
+                }
+            }).catch(
+                console.error
+            );
+        })
+    }

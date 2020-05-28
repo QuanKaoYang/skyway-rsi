@@ -72,11 +72,7 @@
         setLang2Btn.innerText = `${mconf.lang2Name}`
         
         // マイクを取得する
-        localAudio = await navigator.mediaDevices
-        .getUserMedia({
-            audio: true,
-            video: false,
-        }).catch(console.error);
+        localAudio = await getMediaStream(false, true);
 
         muteBtn.addEventListener('click', () => {
             // ミュートがON => ミュート解除
@@ -134,7 +130,6 @@
             if (stream.peerId.startsWith('venue')) {
                 const newRemoteLi = document.createElement('li');
                 newRemoteLi.id = `li-${stream.peerId}`;
-                // newRemoteLi.classList.add('remotes')
                 const newRemoteVideo = document.createElement('video');
                 newRemoteVideo.classList.add('miniVdbox');
                 newRemoteVideo.srcObject = stream;
@@ -289,7 +284,6 @@ async function selectMain(room, info) {
                 document.getElementById('mainVideo').srcObject = rs;
                 document.getElementById('mainVideo').setAttribute('pid', info)
                 await document.getElementById('mainVideo').play().catch(console.error);
-                // break;
             } else {
                 document.getElementById(`li-${rs.peerId}`).classList.remove('currentVdbox')
             }

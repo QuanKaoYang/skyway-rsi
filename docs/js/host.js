@@ -71,11 +71,12 @@
         setLang2Btn.innerText = `Speaker: ${mconf.lang2Name}`
 
         // ビデオとオーディオを取得する
-        localStream = await navigator.mediaDevices
-        .getUserMedia({
-            audio: true,
-            video: true,
-        }).catch(console.error);
+        // localStream = await navigator.mediaDevices
+        // .getUserMedia({
+        //     video: true,
+        //     audio: true,
+        // }).catch(console.error);
+        localStream = await getMediaStream(true, true);
     
         // roomを作っていく
         // man = ホスト-会場

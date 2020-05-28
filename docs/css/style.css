@@ -22,8 +22,9 @@ footer {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 1rem;
     color: white;
+    margin-top: auto;
     display: inline-block;
-    position: absolute;
+    position: relative;
     bottom: 0px;
     background-color: black;
     padding-top: 0.2rem;
@@ -69,99 +70,6 @@ h3.selected {
 }
 
 h3.muted {
+    color: grey;
     text-decoration: line-through;
-}
-
-/* li.remotes {
-    float: left;
-} */
-
-
-/* .container {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr 1fr;
-}
-
-.by1g1 {
-    grid-column: 1/7;
-}
-
-.by3g1 {
-    grid-column: 1/3;
-}
-
-.by3g2 {
-    grid-column: 3/5;
-}
-
-.by3g3 {
-    grid-column: 5/7;
-}
-
-.by2g1 {
-    grid-column: 1/4;
-}
-
-.by2g2 {
-    grid-column: 4/7;
-}
-
-.by1 {
-    grid-column: 1/7;
-}
-
-.by2bg1 {
-    grid-column: 1/6;
-}
-
-.by2bg2 {
-    grid-column: 6/7;
-}
-
-.seg2g1 {
-    grid-row: 1/3;
-}
-
-.seg2g2 {
-    grid-row: 3/5;
-}
-
-.seg2bg1 {
-    grid-row: 1/4;
-}
-
-.seg2bg2 {
-    grid-row: 4/5;
-}
-
-.seg2cg1 {
-    grid-row: 1/2;
-}
-
-.seg2cg2 {
-    grid-row: 2/5;
-}
-
-.seg3g1 {
-    grid-row: 1/3;
-}
-
-.seg3g2 {
-    grid-row: 3/4;
-}
-
-.seg3g3 {
-    grid-row: 4/5;
-} */
-
-
-
-/* div.not {
-    visibility: hidden;
-    display: none;
-} */
-
-.muted {
-    background-color: tomato;
 }

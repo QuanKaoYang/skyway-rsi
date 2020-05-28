@@ -1,6 +1,3 @@
-// const Peer = window.Peer;
-// const strm = window.strm;
-
 (async function main(){
 
     // クエリーストリングが正しければInputボックスに自動入力
@@ -20,7 +17,6 @@
     let localStream;
     let localAudio;
     let screanStream;
-    let screanSharing = false;
     let broadcasting = false;
 
     // 会場用の変数を用意しておく
@@ -31,10 +27,6 @@
     const localVideo = document.getElementById(`venue${suffix}`);
     const initBtn = document.getElementById('initBtn');
     const connectBtn = document.getElementById('connectBtn');
-
-    // const msgs = [];
-    // const msg = document.getElementById('msg');
-    // const sendMsgBtn = document.getElementById('sendMsgBtn');
 
     const shareScrBtn = document.getElementById('shareScrBtn');
 
@@ -68,21 +60,14 @@
         document.getElementById('contents').classList.remove('notshow');
         
         // ビデオとオーディオを取得する
-        localStream = await navigator.mediaDevices
-        .getUserMedia({
-            audio: true,
-            video: true,
-        }).catch(console.error);
+        localStream = await getMediaStream(true, true);
 
         // オーディオのみを取得する
-        localAudio = await navigator.mediaDevices
-        .getUserMedia({
-            audio: true,
-            video: false,
-        }).catch(console.error);
-
+        localAudio = await getMediaStream(false, true);
+        
         // 自分の会場の部分をつくっていく
         localVideo.srcObject = localStream;
+        localVideo.muted = true;
         await localVideo.play().catch(console.error);
         
         // roomに参加する
@@ -129,12 +114,6 @@
             console.log(suffix === selected)
         })
 
-        // 会場-通訳
-        // ip = window.Peer.joinRoom('interpreter', {
-        //     mode: 'sfu',
-        //     stream: localStream,
-        // });
-
         // 会場-オーディエンス
         aud = window.Peer.joinRoom('audience', {
             mode: 'sfu',
@@ -145,7 +124,7 @@
     // スクリーン共有
     shareScrBtn.addEventListener('click', async () => {
         console.log('sharing')
-        const screan = navigator.mediaDevices.getDisplayMedia({ video: true, audio: true }).then( async scrStream => {
+        navigator.mediaDevices.getDisplayMedia({ video: true, audio: true }).then( async scrStream => {
             const main_ = main;
             const ip_ = ip;
             
@@ -157,8 +136,6 @@
                 if (broadcasting) {
                     ip_.replaceStream(scrStream);
                 }
-                // screanSharing = true;
-                // ip_.replaceStream(scrStream)
             }).catch(console.error);
             
             scrStream.getVideoTracks()[0].onended = ev => {
@@ -168,8 +145,6 @@
                     ip_.replaceStream(localStream);
                 }
                 scrStream = null;
-                // screanSharing = false;
-                // ip_.replaceStream(localStream)
             };
         });
     });
