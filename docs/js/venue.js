@@ -60,10 +60,10 @@
         document.getElementById('contents').classList.remove('notshow');
         
         // ビデオとオーディオを取得する
-        localStream = await getMediaStream(true, true);
+        localStream = await getMediaStream({video: true, audio: true});
 
         // オーディオのみを取得する
-        localAudio = await getMediaStream(false, true);
+        localAudio = await getMediaStream({video: false, audio: true});
         
         // 自分の会場の部分をつくっていく
         localVideo.srcObject = localStream;
@@ -127,18 +127,22 @@
         navigator.mediaDevices.getDisplayMedia({ video: true, audio: true }).then( async scrStream => {
             const main_ = main;
             const ip_ = ip;
+            const combinedStream = new MediaStream(
+                [...scrStream.getTracks(), ...localAudio.getTracks()]
+            )
             
             // 成功時にvideo要素にカメラ映像をセットし、再生
-            localVideo.srcObject = scrStream;
+            localVideo.srcObject = combinedStream;
             await localVideo.play().then(()=> {
-                main_.replaceStream(scrStream);
-                screanStream = scrStream;
+                main_.replaceStream(combinedStream);
+                screanStream = combinedStream;
                 if (broadcasting) {
-                    ip_.replaceStream(scrStream);
+                    ip_.replaceStream(combinedStream);
                 }
             }).catch(console.error);
             
-            scrStream.getVideoTracks()[0].onended = ev => {
+            scrStream.getVideoTracks()[0].onended = async ev => {
+                localStream = await getMediaStream({video: true, audio: true});
                 localVideo.srcObject = localStream;
                 main_.replaceStream(localStream);
                 if (broadcasting) {

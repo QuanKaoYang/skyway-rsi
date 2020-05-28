@@ -20,6 +20,7 @@
 
     // ビデオ参照用の変数を用意しておく
     let localStream;
+    let localAudio;
 
     const initBtn = document.getElementById('initBtn');
     const createBtn = document.getElementById('createBtn');
@@ -71,12 +72,10 @@
         setLang2Btn.innerText = `Speaker: ${mconf.lang2Name}`
 
         // ビデオとオーディオを取得する
-        // localStream = await navigator.mediaDevices
-        // .getUserMedia({
-        //     video: true,
-        //     audio: true,
-        // }).catch(console.error);
-        localStream = await getMediaStream(true, true);
+        localStream = await getMediaStream({video: true, audio: true});
+
+        // オーディオのみを取得する
+        localAudio = await getMediaStream({video: false, audio: true});
     
         // roomを作っていく
         // man = ホスト-会場
@@ -184,13 +183,12 @@
             document.getElementById('sendMsg').value = '';
         });
 
-
         // aud 聴衆用
         // mainとipからそれぞれ音声を送り込む
         // hostからも一応は送れるようにしておく
         aud = window.Peer.joinRoom('audience', {
             mode: 'sfu',
-            stream: localStream,
+            stream: localAudio,
         })
 
         // aud roomに参加者が入ったとき

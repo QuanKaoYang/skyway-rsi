@@ -23,13 +23,10 @@ async function getSkyKey(key) {
     })
 }
 
-async function getMediaStream(video, audio) {
+async function getMediaStream(getters) {
     return new Promise((resolve, reject) => {
         navigator.mediaDevices
-            .getUserMedia({
-                video,
-                audio
-            }).then(stream => {
+            .getUserMedia(getters).then(stream => {
                 if (stream === null) {
                     const mock = document.createElement('canvas');
                     resolve(mock.captureStream(10));

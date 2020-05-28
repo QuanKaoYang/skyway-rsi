@@ -72,7 +72,7 @@
         setLang2Btn.innerText = `${mconf.lang2Name}`
         
         // マイクを取得する
-        localAudio = await getMediaStream(false, true);
+        localAudio = await getMediaStream({video: false, audio: true});
 
         muteBtn.addEventListener('click', () => {
             // ミュートがON => ミュート解除
