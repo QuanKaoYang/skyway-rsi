@@ -28,7 +28,7 @@ async function startConf(){
     const muteBtn = document.getElementById('mute');
     const setLang1Btn = document.getElementById('setLang1Btn');
     const setLang2Btn = document.getElementById('setLang2Btn');
-    const reloadBtn = document.getElementById('reloadBtn');
+    // const reloadBtn = document.getElementById('reloadBtn');
 
     let ipMute = false;
 
