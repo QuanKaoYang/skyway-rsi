@@ -39,7 +39,7 @@
     <div id="contents" class="notshow container is-fluid">
     <!-- <div id="contents" class="container is-fluid"> -->
         <!-- ビデオを並べるセクション -->
-        <section class="section" id="videos">
+        <section class="section" id="videos1">
             <div class="columns">
                 <div class="columnes is-one-quarter">
                     <video id="venue1" class="vdbox" controls autoplay playsinline poster="./pict/vn1.png"></video>
@@ -55,18 +55,42 @@
                 </div>
             </div>
         </section>
+        <section class="section notshow" id="videos2">
+            <div class="columns">
+                <div class="columnes is-one-quarter">
+                    <video id="venue5" class="vdbox" controls autoplay playsinline poster="./pict/vn1.png"></video>
+                </div>
+                <div class="columnes is-one-fourth">
+                    <video id="venue6" class="vdbox" controls autoplay playsinline poster="./pict/vn2.png"></video>
+                </div>
+                <div class="columnes is-one-fourth">
+                    <video id="venue7" class="vdbox" controls autoplay playsinline poster="./pict/vn3.png"></video>
+                </div>
+                <div class="columnes is-one-fourth">
+                    <video id="venue8" class="vdbox" controls autoplay playsinline poster="./pict/vn4.png"></video>
+                </div>
+            </div>
+        </section>
         <!-- 操作に関するセクション -->
         <section class="section" id="con-panel">
             <div class="columns">
                 <!-- ボタン領域 -->
                 <div class="column is-one-third">
                     <!-- 発言する会場を指定 -->
+                    <ul class="content">
+                        <li><button id="setNoVenue" class="button venueSel is-primary">No Venue</button></li>
+                    </ul>
                     <ul class="horizon content">
-                        <li><button id="setNoVenue" class="button is-primary">No Venue</button></li>
-                        <li><button id="setVenue1" class="button">Venue1</button></li>
-                        <li><button id="setVenue2" class="button">Venue2</button></li>
-                        <li><button id="setVenue3" class="button">Venue3</button></li>
-                        <li><button id="setVenue4" class="button">Venue4</button></li>
+                        <li><button id="setVenue1" class="button venueSel">Venue1</button></li>
+                        <li><button id="setVenue2" class="button venueSel">Venue2</button></li>
+                        <li><button id="setVenue3" class="button venueSel">Venue3</button></li>
+                        <li><button id="setVenue4" class="button venueSel">Venue4</button></li>
+                    </ul>
+                    <ul class="horizon content notshow">
+                        <li><button id="setVenue5" class="button venueSel">Venue5</button></li>
+                        <li><button id="setVenue6" class="button venueSel">Venue6</button></li>
+                        <li><button id="setVenue7" class="button venueSel">Venue7</button></li>
+                        <li><button id="setVenue8" class="button venueSel">Venue8</button></li>
                     </ul>
 
                     <!-- 音声のコントロール -->
@@ -76,7 +100,7 @@
                     </ul>
                     <ul class="horizon content">
                         <li><button id="setLang0Btn" class="button is-primary">HOST Voice</button></li>
-                        <li><button id="muteLang0Btn" class="button">Host Mute</button></li>
+                        <li><button id="muteLang0Btn" class="button is-danger">Host Mute</button></li>
                     </ul>
                 </div>
 

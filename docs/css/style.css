@@ -1,5 +1,5 @@
 /* 汎用 */
-div.notshow {
+.notshow {
     display: none;
 }
 
@@ -13,7 +13,7 @@ pre#msg {
     padding: 3px;
 }
 
-ul.horizon li{
+ul.horizon li {
     display: inline;
 }
 
@@ -72,4 +72,8 @@ h3.selected {
 h3.muted {
     color: grey;
     text-decoration: line-through;
+}
+
+.hiding {
+    visibility: hidden;
 }

@@ -1,30 +1,20 @@
-(async function main(){
+// 会場用の変数を用意しておく
+let main;
+let aud;
 
-    // クエリーストリングが正しければInputボックスに自動入力
-    if (location.search !== '') {
-        console.log(location.search.replace('?key=', ''))
-        key = await getSkyKey(location.search.replace('?key=', ''));
-        document.getElementById('apikey').value = key;
-    // クエリーストリングがなく、ローカルストレージにapikeyが保存されていればInputボックスに自動入力
-    } else if (window.localStorage.getItem('myskyway') !== null) {
-        document.getElementById('apikey').value = window.localStorage.getItem('myskyway'); 
-    }
-    // 会場ごとにPeerIDを作成するための接尾辞
-    // ハッシュ# 付きのURLを使用する予定
-    const suffix = location.hash ? location.hash.replace('#', '') : "1";
+async function startConf(){
+    // 会場ごとにPeerIDを作成する
+    const self = location.hash ? `venue${location.hash.replace('#', '')}` : 'venue1';
 
     // ビデオ参照用の変数を用意しておく
     let localStream;
     let localAudio;
     let screanStream;
+    let currentOriLang = 'L1'
+    let currentVenue = 'venue0'
     let broadcasting = false;
 
-    // 会場用の変数を用意しておく
-    let main;
-    let ip;
-    let aud;
-
-    const localVideo = document.getElementById(`venue${suffix}`);
+    const localVideo = document.getElementById(self);
     const initBtn = document.getElementById('initBtn');
     const connectBtn = document.getElementById('connectBtn');
 
@@ -33,8 +23,7 @@
     // 最初の接続を行う
     initBtn.addEventListener('click', async() => {
         // Peer接続のためのコンストラクタ
-        // masterからの接頭辞 + 役割 + 接尾辞（ex shitianweidavenue1）
-        window.Peer = new Peer(`venue${suffix}`,{
+        window.Peer = new Peer(self, {
             key: document.getElementById('apikey').value,
             debug: 1,
         });
@@ -100,25 +89,25 @@
                     break;
 
                 case 'change-main':
-                    const selected = data.info.substr(-1);
-                    if (suffix === selected) {
+                    currentVenue = data.info.venue;
+                    currentOriLang = data.info.oriLang;
+                    if (self === data.info.venue) {
+                        broadcasting = true;
                         localStream.getAudioTracks()[0].enabled = true;
-                    } else {
-                        localStream.getAudioTracks()[0].enabled = false;
                     }
                     break;
             
                 default:
                     break;
             }
-            console.log(suffix === selected)
         })
 
         // 会場-オーディエンス
         aud = window.Peer.joinRoom('audience', {
             mode: 'sfu',
-            stream: localAudio,
+            stream: localStream,
         });
+
     });
 
     // スクリーン共有
@@ -126,7 +115,7 @@
         console.log('sharing')
         navigator.mediaDevices.getDisplayMedia({ video: true, audio: true }).then( async scrStream => {
             const main_ = main;
-            const ip_ = ip;
+            const aud_ = currentOriLang === 'L1' ? aud : aud2;
             const combinedStream = new MediaStream(
                 [...scrStream.getTracks(), ...localAudio.getTracks()]
             )
@@ -137,19 +126,34 @@
                 main_.replaceStream(combinedStream);
                 screanStream = combinedStream;
                 if (broadcasting) {
-                    ip_.replaceStream(combinedStream);
+                    aud_.replaceStream(combinedStream);
                 }
             }).catch(console.error);
             
-            scrStream.getVideoTracks()[0].onended = async ev => {
+            scrStream.getVideoTracks()[0].onended = async () => {
                 localStream = await getMediaStream({video: true, audio: true});
                 localVideo.srcObject = localStream;
                 main_.replaceStream(localStream);
                 if (broadcasting) {
-                    ip_.replaceStream(localStream);
+                    aud_.replaceStream(localStream);
                 }
                 scrStream = null;
             };
         });
     });
+};
+
+(async function(){
+    // クエリーストリングが正しければInputボックスに自動入力
+    if (location.search !== '') {
+        console.log(location.search.replace('?key=', ''))
+        key = await getSkyKey(location.search.replace('?key=', ''));
+        document.getElementById('apikey').value = key;
+    // クエリーストリングがなく、ローカルストレージにapikeyが保存されていればInputボックスに自動入力
+    } else if (window.localStorage.getItem('myskyway') !== null) {
+        document.getElementById('apikey').value = window.localStorage.getItem('myskyway'); 
+    }
+    
+    console.log('start');
+    startConf();
 })();

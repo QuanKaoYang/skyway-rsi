@@ -38,34 +38,26 @@
         <!-- メイン画面 ログイン後に表示 -->
         <div id="contents" class="notshow container is-fluid">
         <!-- <div id="contents" class="container is-fluid"> -->
-        <!-- オーディオのセクション -->
-        <section id="audios" class="sectoin">
-            <!-- PCなら横 スマホなら縦 -->
-            <div class="columns is-desktop">
-                <div class="column is-one-third">
-                    <h3 id="originalH" class="voice">ORIGINAL VOICE</h3>
-                    <audio id="original" class="adbox" autoplay playsinline controls poster="./pict/vn1.png"></audio>
-                </div>
-                <div class="column is-one-third">
-                    <h3 id="interH" class="voice">INTERPRETER VOICE</h3>
-                    <audio id="interpreter" class="adbox" autoplay controls playsinline></audio>
-                </div>
-                <div class="column is-one-third">
-                    <h3 id="hostH" class="voice selected">HOST VOICE</h3>
-                    <audio id="host" class="adbox" autoplay controls playsinline></audio>
-                </div>
-            </div>
+        <!-- 映像とオーディオのセクション -->
+        <section id="video" class="sectoin is-fluid">
+            <video id="mainVideo" autoplay></video>
+            <!-- <video id="mainVideo" autoplay controls></video> -->
+            <audio id="subAudio" autoplay muted class="hiding"></audio>
+            <!-- <audio id="subAudio" autoplay muted controls></audio> -->
         </section>
         <section class="section" id="controls">
             <div class="content">
-                <h2 id="langDisp" class="is-size-3">Speaker: Lang1<br />  Interpreter: Lang2</h2>
                 <ul class="horizon">
                     <li><button id="lang1Btn" class="button is-primary">Lang 1:</button></li>
                     <li><button id="lang2Btn" class="button">Lang 2:</button></li>
                 </ul>
             </div>
             <div class="content">
-                <buton class="button is-warning" id="reloadBtn">RELOAD</buton>
+                <ul class="horizon">
+                    <li><buton class="button is-success" id="fullScrBtn">FULL SCREEN</buton></li>
+                    <li><buton class="button is-warning" id="reloadBtn">RELOAD</buton></li>
+                </ul>
+                
             </div>
         </section>
     </div>
