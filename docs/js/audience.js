@@ -4,14 +4,8 @@ let aud;
 async function startConf(){
     // 会場とデフォルトのチャネル別のPeerIDを作成するための接尾辞
     // ハッシュ# 付きのURLを使用する予定
-    let myLang;
-    if (location.hash === '#L2') {
-        myLang = 'L2';
-    } else {
-        myLang = 'L1'
-    }
+    let myLang = location.hash === '#L2' ? 'L2' : 'L1';
     let currentOriLang = 'L1';
-
 
     const initBtn = document.getElementById('initBtn');
     const connectBtn = document.getElementById('connectBtn');
@@ -73,7 +67,7 @@ async function startConf(){
                 mainVideo.srcObject = stream;
             } else if (stream.peerId.startsWith('ip')){
                 subAudio.srcObject = stream;
-            } else if (stream.peerId.startsWith('host')){
+            } else if (stream.peerId.startsWith('host') && stream !== null){
                 subAudio.srcObject = stream;
             }
         });
@@ -81,8 +75,8 @@ async function startConf(){
         aud.on('data', ({ src, data }) => {
             switch (data.type) {
                 case 'toggle-ori-lang':
-                    currentOriLang = data.info.ori;
-                    selectChanel(data.info.ori);
+                    currentOriLang = data.info.oriLang;
+                    selectChanel(data.info.oriLang);
 
                 default:
                     break;
@@ -92,21 +86,16 @@ async function startConf(){
 
     setLang1Btn.addEventListener('click', () => {
         myLang = 'L1';
-        selectChanel(myLang);
+        selectChanel(currentOriLang);
         setLang1Btn.classList.add('is-primary');
-        setLang1Btn.disabled = true;
         setLang2Btn.classList.remove('is-primary')
-        setLang2Btn.disabled = false;
-        
     });
 
     setLang2Btn.addEventListener('click', () => {
         myLang = 'L2';
-        selectChanel(myLang);
+        selectChanel(currentOriLang);
         setLang2Btn.classList.add('is-primary');
-        setLang2Btn.disabled = true;
         setLang1Btn.classList.remove('is-primary')
-        setLang1Btn.disabled = false;
     });
 
     reloadBtn.addEventListener('click', () => {
@@ -124,13 +113,13 @@ async function startConf(){
             .then(()=> {
                 console.log('full');
             })
-            .cacte(() => {
+            .catch(() => {
                 console.error;
             });
     });
 
     const selectChanel = (ch) => {
-        if (currentOriLang === ch) {
+        if (myLang === ch) {
             mainVideo.muted = false;
             subAudio.muted = true;
         } else {

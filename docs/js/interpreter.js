@@ -12,7 +12,6 @@ async function startConf(){
     // ビデオ参照用の変数を用意しておく
     let localAudio;
 
-
     let currentOriLang = 'L1';
     let currentVenue = 'venue0';
 

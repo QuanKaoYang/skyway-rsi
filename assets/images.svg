@@ -16,7 +16,7 @@
    version="1.1"
    inkscape:version="0.91 r13725"
    sodipodi:docname="venue.svg"
-   inkscape:export-filename="D:\Codes\skyway-rsi\docs\pict\vn4.png"
+   inkscape:export-filename="D:\Codes\skyway-rsi\docs\pict\noimage.png"
    inkscape:export-xdpi="85.720001"
    inkscape:export-ydpi="85.720001">
   <defs
@@ -29,10 +29,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.35"
-     inkscape:cx="-1086.4286"
-     inkscape:cy="520"
+     inkscape:cx="74.999971"
+     inkscape:cy="622.85714"
      inkscape:document-units="px"
-     inkscape:current-layer="g4145"
+     inkscape:current-layer="g4179"
      showgrid="false"
      units="px"
      inkscape:window-width="1920"
@@ -53,7 +53,7 @@
     </rdf:RDF>
   </metadata>
   <g
-     inkscape:label="レイヤー 1"
+     inkscape:label="venue 1"
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-602.36219)"
@@ -77,7 +77,7 @@
      transform="translate(0,-602.36219)"
      id="g4144"
      inkscape:groupmode="layer"
-     inkscape:label="レイヤー 2"
+     inkscape:label="venue 2"
      style="display:none"
      sodipodi:insensitive="true">
     <text
@@ -95,7 +95,7 @@
          sodipodi:role="line">Venue 2</tspan></text>
   </g>
   <g
-     inkscape:label="レイヤー 3"
+     inkscape:label="venue 3"
      inkscape:groupmode="layer"
      id="g4150"
      transform="translate(0,-602.36219)"
@@ -116,11 +116,12 @@
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:170.50674438px;font-family:'BIZ UDPGothic';-inkscape-font-specification:'BIZ UDPGothic Bold'">Venue 3</tspan></text>
   </g>
   <g
-     style="display:inline"
+     style="display:none"
      transform="translate(0,-602.36219)"
      id="g4145"
      inkscape:groupmode="layer"
-     inkscape:label="レイヤー 4">
+     inkscape:label="venue 4"
+     sodipodi:insensitive="true">
     <text
        transform="scale(0.9472597,1.0556767)"
        sodipodi:linespacing="125%"
@@ -134,6 +135,96 @@
          y="847.46381"
          x="33.594368"
          sodipodi:role="line">Venue 4</tspan></text>
+  </g>
+  <g
+     inkscape:label="venue 5"
+     inkscape:groupmode="layer"
+     id="g4148"
+     transform="translate(0,-602.36219)"
+     style="display:none"
+     sodipodi:insensitive="true">
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:37.89038849px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="33.594368"
+       y="847.46381"
+       id="text4150"
+       sodipodi:linespacing="125%"
+       transform="scale(0.9472597,1.0556767)"><tspan
+         sodipodi:role="line"
+         x="33.594368"
+         y="847.46381"
+         id="tspan4152"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:170.50674438px;font-family:'BIZ UDPGothic';-inkscape-font-specification:'BIZ UDPGothic Bold'">Venue 5</tspan></text>
+  </g>
+  <g
+     style="display:none"
+     transform="translate(0,-602.36219)"
+     id="g4154"
+     inkscape:groupmode="layer"
+     inkscape:label="venue 6"
+     sodipodi:insensitive="true">
+    <text
+       transform="scale(0.9472597,1.0556767)"
+       sodipodi:linespacing="125%"
+       id="text4156"
+       y="847.46381"
+       x="33.594368"
+       style="font-style:normal;font-weight:normal;font-size:37.89038849px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:170.50674438px;font-family:'BIZ UDPGothic';-inkscape-font-specification:'BIZ UDPGothic Bold'"
+         id="tspan4158"
+         y="847.46381"
+         x="33.594368"
+         sodipodi:role="line">Venue 6</tspan></text>
+  </g>
+  <g
+     inkscape:label="venue 7"
+     inkscape:groupmode="layer"
+     id="g4160"
+     transform="translate(0,-602.36219)"
+     style="display:none"
+     sodipodi:insensitive="true">
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:37.89038849px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="33.594368"
+       y="847.46381"
+       id="text4162"
+       sodipodi:linespacing="125%"
+       transform="scale(0.9472597,1.0556767)"
+       inkscape:export-filename="D:\Codes\skyway-rsi\docs\pict\vn7.png"
+       inkscape:export-xdpi="85.720001"
+       inkscape:export-ydpi="85.720001"><tspan
+         sodipodi:role="line"
+         x="33.594368"
+         y="847.46381"
+         id="tspan4164"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:170.50674438px;font-family:'BIZ UDPGothic';-inkscape-font-specification:'BIZ UDPGothic Bold'">Venue 7</tspan></text>
+  </g>
+  <g
+     style="display:none"
+     transform="translate(0,-602.36219)"
+     id="g4166"
+     inkscape:groupmode="layer"
+     inkscape:label="venue 8"
+     sodipodi:insensitive="true">
+    <text
+       transform="scale(0.9472597,1.0556767)"
+       sodipodi:linespacing="125%"
+       id="text4168"
+       y="847.46381"
+       x="33.594368"
+       style="font-style:normal;font-weight:normal;font-size:37.89038849px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       xml:space="preserve"
+       inkscape:export-filename="D:\Codes\skyway-rsi\docs\pict\vn8.png"
+       inkscape:export-xdpi="85.720001"
+       inkscape:export-ydpi="85.720001"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:170.50674438px;font-family:'BIZ UDPGothic';-inkscape-font-specification:'BIZ UDPGothic Bold'"
+         y="847.46381"
+         x="33.594368"
+         sodipodi:role="line"
+         id="tspan4172">Venue 8</tspan></text>
   </g>
   <g
      style="display:none"
@@ -160,5 +251,30 @@
          x="99.951187"
          sodipodi:role="line"
          id="tspan4155">Wait...</tspan></text>
+  </g>
+  <g
+     inkscape:label="No Image"
+     inkscape:groupmode="layer"
+     id="g4179"
+     transform="translate(0,-602.36219)"
+     style="display:inline">
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:37.89038849px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="48.675461"
+       y="750.03137"
+       id="text4181"
+       sodipodi:linespacing="125%"
+       transform="scale(0.9472597,1.0556767)"><tspan
+         id="tspan4185"
+         sodipodi:role="line"
+         x="48.675461"
+         y="750.03137"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:170.50674438px;font-family:'BIZ UDPGothic';-inkscape-font-specification:'BIZ UDPGothic Bold'">No</tspan><tspan
+         sodipodi:role="line"
+         x="48.675461"
+         y="963.16479"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:170.50674438px;font-family:'BIZ UDPGothic';-inkscape-font-specification:'BIZ UDPGothic Bold'"
+         id="tspan4190">Image...</tspan></text>
   </g>
 </svg>

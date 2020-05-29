@@ -245,67 +245,6 @@ async function startConf() {
         })        
     }
 
-    // setNoVenue.addEventListener('click', () => {
-    //     currentVenue = 'venue0';
-    //     setVenueBtnColor(0);
-    //     main.send({
-    //         type: 'change-main',
-    //         info: {
-    //             oriLang: currentOriLang,
-    //             venue: currentVenue,
-    //         },
-    //     });
-    // });
-
-    // setVenue1.addEventListener('click', () => {
-    //     currentVenue = 'venue1',
-    //     setVenueBtnColor(1);
-    //     main.send({
-    //         type: 'change-main',
-    //         info: {
-    //             oriLang: currentOriLang,
-    //             venue: currentVenue,
-    //         },
-    //     });
-    // });
-
-    // setVenue2.addEventListener('click', () => {
-    //     currentVenue = 'venue2',
-    //     setVenueBtnColor(2);
-    //     main.send({
-    //         type: 'change-main',
-    //         info: {
-    //             oriLang: currentOriLang,
-    //             venue: currentVenue,
-    //         },
-    //     })
-    // });
-
-    // setVenue3.addEventListener('click', () => {
-    //     currentVenue = 'venue3',
-    //     setVenueBtnColor(3);
-    //     main.send({
-    //         type: 'change-main',
-    //         info: {
-    //             oriLang: currentOriLang,
-    //             venue: currentVenue,
-    //         },
-    //     });
-    // });
-
-    // setVenue4.addEventListener('click', () => {
-    //     currentVenue = 'venue4',
-    //     setVenueBtnColor(4);
-    //     main.send({
-    //         type: 'change-main',
-    //         info: {
-    //             oriLang: currentOriLang,
-    //             venue: currentVenue,
-    //         },
-    //     });
-    // });
-
-
     // 言語切り替え用の関数
     const setOriL0 = () => {
         setLang0Btn.classList.add('is-primary');
@@ -319,23 +258,41 @@ async function startConf() {
     }
 
     const setOriL1 = () => {
+        const que = {
+            type: 'toggle-ori-lang',
+            info: {
+                oriLang: 'L1',
+                venue: currentVenue,
+            },
+        };
+        main.send(que);
+        aud.send(que);
+        // aud.replaceStream(null);
         setLang0Btn.classList.remove('is-primary');
         setLang1Btn.classList.add('is-primary');
         setLang2Btn.classList.remove('is-primary');
         currentOriLang = 'L1';
         hostMuted = true;
         localAudio.getAudioTracks()[0].enabled = false;
-        aud.replaceStream(null);
     }
 
     const setOriL2 = () => {
+        const que = {
+            type: 'toggle-ori-lang',
+            info: {
+                oriLang: 'L2',
+                venue: currentVenue,
+            },
+        };
+        main.send(que);
+        aud.send(que);
+        aud.replaceStream(null);
         setLang0Btn.classList.remove('is-primary');
         setLang1Btn.classList.remove('is-primary');
         setLang2Btn.classList.add('is-primary');
         currentOriLang = 'L2';
         hostMuted = true;
         localAudio.getAudioTracks()[0].enabled = false;
-        aud.replaceStream(null);
     }
 
     setLang0Btn.addEventListener('click', () => {
@@ -345,7 +302,7 @@ async function startConf() {
                 oriLang: 'L0',
                 venue: 'V0',
             },
-        }
+        };
         main.send(que);
         aud.send(que);
         setLang0Btn.classList.add('is-primary');
