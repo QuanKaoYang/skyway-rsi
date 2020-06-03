@@ -1,6 +1,6 @@
 // 会場用の変数を用意しておく
 let main;
-let aud;
+// let aud;
 
 async function startConf(){
     // 会場ごとにPeerIDを作成する
@@ -10,8 +10,9 @@ async function startConf(){
     let localStream;
     let localAudio;
     let screanStream;
-    let currentOriLang = 'L1'
-    let currentVenue = 'venue0'
+    let currentOriLang = 'L1';
+    let currentVenue = 'venue0';
+    let currentIp = 'ip1';
     let broadcasting = false;
 
     const localVideo = document.getElementById(self);
@@ -81,6 +82,7 @@ async function startConf(){
 
         // ホストからのデータチャンネル
         main.on('data', async ({ src, data }) => {
+            console.log(data);
             // 配信要請関連
             // 自会場がメインとして配信された場合以外はMuteにする
             switch (data.type) {
@@ -88,14 +90,33 @@ async function startConf(){
                     localStream.getAudioTracks()[0].enabled = true;
                     break;
 
-                case 'change-main':
-                    currentVenue = data.info.venue;
-                    currentOriLang = data.info.oriLang;
-                    if (self === data.info.venue) {
-                        broadcasting = true;
-                        localStream.getAudioTracks()[0].enabled = true;
+                case 'change-params':
+                    if (data.info.venue !== currentVenue) {
+                        currentVenue = data.info.venue;
+                        if (self === data.info.venue) {
+                            broadcasting = true;
+                            localStream.getAudioTracks()[0].enabled = true;
+                        }
                     }
+
+                    if (data.info.oriLang !== currentOriLang){
+                        currentOriLang = data.info.oriLang;
+                    }
+
+                    if (data.info.ip !== currentIp) {
+                        currentOriLang = data.info.ip;
+                    }
+                    
                     break;
+                
+                // case 'change-main':
+                //     currentVenue = data.info.venue;
+                //     currentOriLang = data.info.oriLang;
+                //     if (self === data.info.venue) {
+                //         broadcasting = true;
+                //         localStream.getAudioTracks()[0].enabled = true;
+                //     }
+                //     break;
             
                 default:
                     break;
@@ -103,10 +124,10 @@ async function startConf(){
         })
 
         // 会場-オーディエンス
-        aud = window.Peer.joinRoom('audience', {
-            mode: 'sfu',
-            stream: localStream,
-        });
+        // aud = window.Peer.joinRoom('audience', {
+        //     mode: 'sfu',
+        //     stream: localStream,
+        // });
 
     });
 
@@ -115,7 +136,7 @@ async function startConf(){
         console.log('sharing')
         navigator.mediaDevices.getDisplayMedia({ video: true, audio: true }).then( async scrStream => {
             const main_ = main;
-            const aud_ = currentOriLang === 'L1' ? aud : aud2;
+            // const aud_ = currentOriLang === 'L1' ? aud : aud2;
             const combinedStream = new MediaStream(
                 [...scrStream.getTracks(), ...localAudio.getTracks()]
             )
@@ -125,18 +146,18 @@ async function startConf(){
             await localVideo.play().then(()=> {
                 main_.replaceStream(combinedStream);
                 screanStream = combinedStream;
-                if (broadcasting) {
-                    aud_.replaceStream(combinedStream);
-                }
+                // if (broadcasting) {
+                //     aud_.replaceStream(combinedStream);
+                // }
             }).catch(console.error);
             
             scrStream.getVideoTracks()[0].onended = async () => {
                 localStream = await getMediaStream({video: true, audio: true});
                 localVideo.srcObject = localStream;
                 main_.replaceStream(localStream);
-                if (broadcasting) {
-                    aud_.replaceStream(localStream);
-                }
+                // if (broadcasting) {
+                //     aud_.replaceStream(localStream);
+                // }
                 scrStream = null;
             };
         });

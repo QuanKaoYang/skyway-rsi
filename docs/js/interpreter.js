@@ -1,22 +1,22 @@
-// const Peer = window.Peer;
-// const strm = window.strm;
-
 // 会場用の変数を用意しておく
-let main;
-let aud;
+let ip;
+let myTurn = false;
 
 async function startConf(){
     // 通訳者ごとにPeerIDを作成する
     const self = location.hash ? `ip${location.hash.replace('#', '')}` : 'ip1';
+    let ips = [self];
+    let asking = false;
+    let acceptance;
 
-    // ビデオ参照用の変数を用意しておく
+    // 音声参照用の変数を用意しておく
     let localAudio;
 
-    let currentOriLang = 'L1';
+    let currentOriLang = 'L0';
     let currentVenue = 'venue0';
+    let currentIp = 'ip1';
 
     const mainRemote = document.getElementById('mainVideo');
-    const remotes = document.getElementById('remotes');
     const initBtn = document.getElementById('initBtn');
     const connectBtn = document.getElementById('connectBtn');
 
@@ -24,17 +24,17 @@ async function startConf(){
     const msg = document.getElementById('msg');
     const sendMsgBtn = document.getElementById('sendMsgBtn');
 
+    const handOverBtn = document.getElementById('handOverBtn')
     const muteBtn = document.getElementById('mute');
+    let ipMute = false;
+    let speakingIp = 'ip1';
+
     const setLang1Btn = document.getElementById('setLang1Btn');
     const setLang2Btn = document.getElementById('setLang2Btn');
-    // const reloadBtn = document.getElementById('reloadBtn');
-
-    let ipMute = false;
 
     // 最初の接続を行う
     initBtn.addEventListener('click', async() => {
         // Peer接続のためのコンストラクタ
-        // masterからの接頭辞 + 役割 + 接尾辞（ex shitianweidainter1）
         window.Peer = new Peer(self, {
             key: document.getElementById('apikey').value,
             debug: 1,
@@ -59,8 +59,8 @@ async function startConf(){
         // 表示領域の変更を行う
         document.getElementById('pass').classList.add('notshow');
         document.getElementById('contents').classList.remove('notshow');
-        setLang1Btn.innerText = `${mconf.lang1Name}`
-        setLang2Btn.innerText = `${mconf.lang2Name}`
+        setLang1Btn.innerText = `${mconf.lang1Name}`;
+        setLang2Btn.innerText = `${mconf.lang2Name}`;
         
         // マイクを取得する
         localAudio = await getMediaStream({video: false, audio: true});
@@ -68,125 +68,153 @@ async function startConf(){
         muteBtn.addEventListener('click', () => {
             // ミュートがON => ミュート解除
             if (ipMute) {
-                ipMute = false;
-                localAudio.getAudioTracks()[0].enabled = true;
-                muteBtn.classList.remove('is-danger');
-                main.send({
+                unmuting()
+                ip.send({
                     type: 'ip-unmute',
                 })
             // ミュートがOFF => ミュート
             } else {
-                ipMute = true;
-                localAudio.getAudioTracks()[0].enabled = false;
-                muteBtn.classList.add('is-danger');
-                main.send({
+                muting(false);
+                ip.send({
                     type: 'ip-mute',
                 })
             }
         });
 
+        const changeParam = () => {
+            ip.send({
+                type: 'change-params',
+                info: {
+                    oriLang: currentOriLang,
+                    venue: currentVenue,
+                    ip: currentIp,
+                },
+            });
+        }
+
         setLang1Btn.addEventListener('click', () => {
             setLang1Btn.classList.add('is-primary');
             setLang2Btn.classList.remove('is-primary');
-            const que = {
-                type: 'toggle-ori-lang',
-                info: {
-                    oriLang: 'L2',
-                    venue: currentVenue,
-                },
-            };
-            main.send(que);
-            aud.send(que);
+            currentOriLang = 'L2';
+            changeParam();
         });
 
         setLang2Btn.addEventListener('click', () => {
             setLang1Btn.classList.remove('is-primary');
             setLang2Btn.classList.add('is-primary');
-            const que = {
-                type: 'toggle-ori-lang',
-                info: {
-                    oriLang: 'L1',
-                    venue: currentVenue,
-                },
-            };
-            main.send(que);
-            aud.send(que);
+            currentOriLang = 'L1';
+            changeParam();
         })
 
         // roomに参加する
         // 会場からの映像・音声を受け取るチャンネル
         // 受信専用なので stream はnull にしておく
-        main = window.Peer.joinRoom('mainsession', {
+        ip = window.Peer.joinRoom('ip', {
             mode: 'sfu',
-            stream: null,
+            stream: localAudio,
         });
 
-        main.on('stream', async stream => {
-            if (stream.peerId.startsWith('venue')) {
-                const newRemoteLi = document.createElement('li');
-                newRemoteLi.id = `li-${stream.peerId}`;
-                const newRemoteVideo = document.createElement('video');
-                newRemoteVideo.classList.add('miniVdbox');
-                newRemoteVideo.srcObject = stream;
-                newRemoteVideo.playsInline = true;
-                newRemoteLi.appendChild(newRemoteVideo);
-                newRemoteLi.addEventListener('click', () => {
-                    console.log('venue selected')
-                    selectMain(main, stream.peerId)
-                });
-                remotes.append(newRemoteLi);
-                await newRemoteVideo.play().catch(console.error);
-            }
-        });
-
-        // 会場側が接続を切った場合、リスト化しているビデオを削除する
-        main.on('peerLeave', peerId => {
-            if (peerId.startsWith('venue')) {
-                console.log(`Venue Left: ${peerId}`);
-                const remoteLi = document.getElementById(`li-${peerId}`);
-                remotes.removeChild(remoteLi);
-                // メイン画面に映している会場が接続を切った場合、メイン画面を初期値に戻す
-                if (mainRemote.getAttribute('pid') === peerId) {
-                    mainRemote.srcObject = null;
-                    mainRemote.setAttribute('pid', '');
+        ip.on('open', () => {
+            // 先に通訳者がいた場合、後から入った方のページではマイクをOFFにする
+            let hasHost = false
+            for (const m of ip.members) {
+                if (m.startsWith('ip')) {
+                    ips.push(m);
+                } else if (m === 'host') {
+                    hasHost = true
                 }
             }
+            ips.sort();
+            if (!hasHost) {
+                if (ips.length === 1) {
+                    myTurn = true;
+                }
+                getTurn(myTurn);
+            }
+        })
+
+        ip.on('stream', async stream => {
+            mainRemote.srcObject = stream;
+            await mainRemote.play().catch(console.error);
         });
 
-        // メインでのデータのやり取り
-        main.on('data', ({src, data}) => {
-            switch (data.type) {
-                // 会場からの放送を受け取ったら放送欄を入れ替える
-                case 'change-main':
-                    if (data.info.venue !== 'venue0') {
-                        selectMain(main, data.info.venue);
+        // 他の通訳が参加したことを検知する
+        ip.on('peerJoin', peerId => {
+            if (peerId.startsWith('ip')) {
+                msg.innerText = updateDisplayText(msgs, `Other Interpreter Joined: ${peerId}`, 20);
+                ips.push(peerId);
+                ips.sort();
+            }
+            getTurn(myTurn);
+        })
+
+        // 接続が減った場合の処理
+        ip.on('peerLeave', peerId => {
+            if (peerId.startsWith('ip')) {
+                console.log(`Interpreter Left: ${peerId}`);
+                ips = ips.filter(val => {
+                    return val !== peerId;
+                });
+                ips.sort();
+                if (peerId === speakingIp) {
+                    speakingIp = ips[0];
+                    if (speakingIp === self) {
+                        myTurn = true;
                     }
-                    currentVenue = data.info.venue;
-                    break;
+                }
+                getTurn(myTurn);
+            }
+        });
+
+        // データのやり取り
+        ip.on('data', ({src, data}) => {
+            console.log(data);
+            switch (data.type) {
                 
                 case 'msg':
                     msg.innerText = updateDisplayText(msgs, data.info, 20);
                     break;
                 
-                case 'toggle-ori-lang':
-                    currentVenue = data.info.venue;
-                    switch (data.info.oriLang) {
-                        case 'L0':
-                            setOriL0();
-                            break;
-
-                        case 'L1':
-                            setOriL1();
-                            break;
-                        
-                        case 'L2':
-                            setOriL2();
-                            break;
-                    
-                        default:
-                            break;
+                case 'change-params':
+                    if (data.info.venue !== currentVenue) {
+                        currentVenue = data.info.venue;
+                        // selectMain();
                     }
+                    if (data.info.oriLang !== currentOriLang) {
+                        currentOriLang = data.info.oriLang;
+                        switch(currentOriLang) {
+                            case 'L0':
+                                setOriL0();
+                                break;
+                            case 'L1':
+                                setOriL1();
+                                break;
+                            case 'L2':
+                                setOriL2();
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    if (data.info.ip !== currentIp) {
+                        currentIp = data.info.ip;
+                    }
+                    if (currentIp === self) {
+                        myTurn = true;
+                    } else {
+                        myTurn = false;
+                    }
+                    getTurn(myTurn)
                     break;
+
+                case 'hand-over':
+                    if (data.to === self) {
+                        acceptance = setTimeout(rejectHandle, 10000);
+                        asking = true;
+                        handOverBtn.disabled = false;
+                        handOverBtn.classList.remove('is-black')
+                        handOverBtn.classList.add('is-white')
+                    }
 
                 default:
                     break;
@@ -197,7 +225,7 @@ async function startConf(){
             if (ev.keyCode === 13) {
                 const text = document.getElementById('sendMsg').value;
                 msg.innerText = updateDisplayText(msgs, text, 20);
-                main.send({
+                ip.send({
                     type: 'msg',
                     info: text,
                 });
@@ -208,23 +236,49 @@ async function startConf(){
         sendMsgBtn.addEventListener('click', () => {
             const text = document.getElementById('sendMsg').value;
             msg.innerText = updateDisplayText(msgs, text, 20);
-            main.send({
+            ip.send({
                 type: 'msg',
                 info: text,
             });
             document.getElementById('sendMsg').value = '';
         })
 
-        aud = window.Peer.joinRoom('audience', {
-            mode: 'sfu',
-            stream: localAudio,
-        });
-
-        aud.on('open', () => {
-            if (currentOriLang === 'L0') {
-                aud.replaceStream(null);
+        handOverBtn.addEventListener('click', () => {
+            if (!asking) {
+                const targetIp = self === 'ip1' ? 'ip2' : 'ip1';
+                ip.send({
+                    type: 'hand-over',
+                    from: self,
+                    to: targetIp,
+                });
+            } else {
+                clearTimeout(acceptance);
+                currentIp = self;
+                changeParam();
+                asking = false;
+                myTurn = true;
+                getTurn(myTurn)
+                // ip.send({
+                //     type: 'hand-over-ok',
+                //     to: self,
+                // });
+                handOverBtn.classList.add('is-black')
+                handOverBtn.classList.remove('is-white')
             }
-        });
+        })
+
+        const rejectHandle = () => {
+            console.log('reject')
+            ip.send({
+                type: 'msg',
+                info: `${self} cannot accept right now`
+            })
+            asking = false;
+            handOverBtn.disabled = true;
+            handOverBtn.classList.add('is-black')
+            handOverBtn.classList.remove('is-white')
+            console.log('reject end')
+        }
 
     });
 
@@ -255,24 +309,41 @@ async function startConf(){
         setLang2Btn.classList.remove('is-primary');
         msg.innerText = updateDisplayText(msgs, 'lang toggled by @host', 20);
     }
-};
 
-async function selectMain(room, info) {
-    if (info === 'none') {
-        room.remote.srcObject = null;
-    } else {
-        for (const rs of Object.values(room.remoteStreams)) {
-            if (rs.peerId === info) {
-                document.getElementById(`li-${rs.peerId}`).classList.add('currentVdbox')
-                document.getElementById('mainVideo').srcObject = rs;
-                document.getElementById('mainVideo').setAttribute('pid', info)
-                await document.getElementById('mainVideo').play().catch(console.error);
+    const getTurn = (turn) => {
+        console.log(turn)
+        if (turn) {
+            unmuting();
+            setLang1Btn.disabled = false;
+            setLang2Btn.disabled = false;
+            if (ips.length > 1) {
+                handOverBtn.disabled = false;
             } else {
-                document.getElementById(`li-${rs.peerId}`).classList.remove('currentVdbox')
+                handOverBtn.disabled = true;
             }
+        } else {
+            muting(true);
+            setLang1Btn.disabled = true;
+            setLang2Btn.disabled = true;
+            handOverBtn.disabled = true;
         }
     }
-}
+    const muting = (lock) => {
+        ipMute = true;
+        localAudio.getAudioTracks()[0].enabled = false;
+        muteBtn.classList.add('is-danger');
+        muteBtn.disabled = lock;
+        muteLock = lock;
+    }
+    
+    const unmuting = () => {
+        ipMute = false;
+        localAudio.getAudioTracks()[0].enabled = true;
+        muteBtn.classList.remove('is-danger');
+        muteBtn.disabled = false;
+        muteLock = false;
+    }
+};
 
 (async function(){
     // クエリーストリングが正しければInputボックスに自動入力
@@ -287,3 +358,4 @@ async function selectMain(room, info) {
     console.log('start');
     startConf();
 })();
+
