@@ -40,26 +40,26 @@ footer {
 }
 
 /* 通訳用 1 */
-.mainVdbox {
+.main-vdbox {
     width: 1280px;
     height: 720px;
     margin: 5px;
 }
 
 /* 通訳用 2 */
-.miniVdbox {
+/* .mini-vdbox {
     width: 240px;
     height: 135px;
     margin: 5px;
-}
+} */
 
 /* 通訳用 3 */
-.currentVdbox {
+/* .currentVdbox {
     background-color: teal;
-}
+} */
 
 /* オーディエンス用 */
-h3.voice {
+/* h3.voice {
     padding: 0.3rem;
 }
 
@@ -72,7 +72,7 @@ h3.selected {
 h3.muted {
     color: grey;
     text-decoration: line-through;
-}
+} */
 
 .hiding {
     visibility: hidden;

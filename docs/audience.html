@@ -27,8 +27,8 @@
                             <input id="apikey" type="text" placeholder="skyway api key" class="input">
                         </div>
                         <div class="column is-3">
-                            <button id="initBtn" class="button is-info">OPEN</button>
-                            <button id="connectBtn" class="button is-success" disabled>Connect to Host</button>
+                            <button id="init-btn" class="button is-info">OPEN</button>
+                            <button id="connect-btn" class="button is-success" disabled>Connect to Host</button>
                         </div>
                     </div>
                 </div>
@@ -40,22 +40,19 @@
         <!-- <div id="contents" class="container is-fluid"> -->
         <!-- 映像とオーディオのセクション -->
         <section id="video" class="sectoin is-fluid">
-            <video id="mainVideo" autoplay poster="./pict/noimage.png"></video>
-            <!-- <video id="mainVideo" autoplay controls></video> -->
-            <audio id="subAudio" autoplay muted class="hiding"></audio>
-            <!-- <audio id="subAudio" autoplay muted controls></audio> -->
+            <video id="main-video" class='main-vdbox' autoplay controls poster="./pict/noimage.png"></video>
         </section>
         <section class="section" id="controls">
             <div class="content">
                 <ul class="horizon">
-                    <li><button id="lang1Btn" class="button is-primary">Lang 1:</button></li>
-                    <li><button id="lang2Btn" class="button">Lang 2:</button></li>
+                    <li><button id="lang1-btn" class="button is-primary">Lang 1:</button></li>
+                    <li><button id="lang2-btn" class="button">Lang 2:</button></li>
                 </ul>
             </div>
             <div class="content">
                 <ul class="horizon">
-                    <li><buton class="button is-success" id="fullScrBtn">FULL SCREEN</buton></li>
-                    <li><buton class="button is-warning" id="reloadBtn">RELOAD</buton></li>
+                    <!-- <li><buton class="button is-success" id="fullScr-btn">FULL SCREEN</buton></li> -->
+                    <li><buton class="button is-warning" id="reload-btn">RELOAD</buton></li>
                 </ul>
                 
             </div>

@@ -15,24 +15,24 @@ async function startConf() {
     // マイク参照用の変数を用意しておく
     let localStream;
 
-    const initBtn = document.getElementById('initBtn');
-    const createBtn = document.getElementById('createBtn');
+    const initBtn = document.getElementById('init-btn');
+    const createBtn = document.getElementById('create-btn');
 
     const venueList = document.querySelectorAll('.venueSel')
     
     // 言語設定用の変数
     let hostMuted = true;
-    const setLang0Btn = document.getElementById('setLang0Btn');
-    const muteLang0Btn = document.getElementById('muteLang0Btn');
-    const setLang1Btn = document.getElementById('setLang1Btn');
-    const setLang2Btn = document.getElementById('setLang2Btn');
+    const setLang0Btn = document.getElementById('setLang0-btn');
+    const muteLang0Btn = document.getElementById('muteLang0-btn');
+    const setLang1Btn = document.getElementById('setLang1-btn');
+    const setLang2Btn = document.getElementById('setLang2-btn');
 
     // 通信・管理用の変数
     const statuses = [];
     const status = document.getElementById('console');
     const msgs = [];
     const msg = document.getElementById('msg')
-    const sendMsgBtn = document.getElementById('sendMsgBtn')
+    const sendMsgBtn = document.getElementById('sendMsg-btn')
 
     // 最初の接続を行う
     initBtn.addEventListener('click', async() => {

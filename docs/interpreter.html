@@ -26,8 +26,8 @@
                         <input id="apikey" type="text" placeholder="skyway api key" class="input">
                     </div>
                     <div class="column is-3">
-                        <button id="initBtn" class="button is-info">OPEN</button>
-                        <button id="connectBtn" class="button is-success" disabled>Connect to Host</button>
+                        <button id="init-btn" class="button is-info">OPEN</button>
+                        <button id="connect-btn" class="button is-success" disabled>Connect to Host</button>
                     </div>
                 </div>
             </div>
@@ -42,7 +42,7 @@
             <div class="columns">
                 <!-- メインビデオ -->
                 <div class="column is-10">
-                    <video id="mainVideo" class="mainVdbox"
+                    <video id="main-video" class="main-vdbox"
                         autoplay
                         playsinline
                         poster="./pict/wait.png"
@@ -50,11 +50,17 @@
                 </div>
                 <div class="column is-2">
                     <ul class="horizon">
-                        <li><button class="button" id="setLang1Btn">Lang1</button></li>
-                        <li><button class="button" id="setLang2Btn">Lang2</button></li>
+                        <li><button class="button" id="setLang1-btn">Lang1</button></li>
+                        <li><button class="button" id="setLang2-btn">Lang2</button></li>
+                        <li><button class="button" id="mute">Mute</button></li>
                     </ul>
-                    <button class="button" id="mute">Mute</button>
-                    <button class="button is-black" id="handOverBtn" disabled>HAND OVER</button>
+
+                    <hr />
+
+                    <ul class="horizon">
+                        <li><button class="button is-black" id="handOver-btn" disabled>HAND OVER</button></li>
+                        <li><button class="button is-warning" id="request-btn">REQUEST</button></li>
+                    </ul>
 
                     <hr />
 
@@ -63,7 +69,27 @@
                     </div>
                     <div class="content">
                         <textarea id="sendMsg" placeholder="message..." rows="3" cols="40"></textarea>
-                        <button id="sendMsgBtn" class="button is-success is-small">Send</button>
+                        <button id="sendMsg-btn" class="button is-success is-small">Send</button>
+                    </div>
+                </div>
+                <div class="modal" id="hand-modal">
+                    <div class="modal-background"></div>
+                    <div class="modal-card">
+                        <header class="modal-card-head">
+                            <p class="modal-card-title">確認</p>
+                            <!-- <button class="delete" aria-label="close" data-target="my-modal"></button> -->
+                            <button class="delete" aria-label="close" id="del-btn"></button>
+                        </header>
+                        <section class="modal-card-body">
+                            交代可能ですか？
+                        </section>
+                        <footer class="modal-card-foot">
+                            <ul class="horizon">
+                                <li><button id="accept-btn" class="button is-success">ACCEPT</button></li>
+                                <li><button id="reject-btn" class="button is-danger">REJECT NOW</button></li>
+                            </ul>
+                            
+                        </footer>
                     </div>
                 </div>
             </div>

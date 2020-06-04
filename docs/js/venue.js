@@ -16,10 +16,11 @@ async function startConf(){
     let broadcasting = false;
 
     const localVideo = document.getElementById(self);
-    const initBtn = document.getElementById('initBtn');
-    const connectBtn = document.getElementById('connectBtn');
+    const initBtn = document.getElementById('init-btn');
+    const connectBtn = document.getElementById('connect-btn');
 
-    const shareScrBtn = document.getElementById('shareScrBtn');
+    const shareScrBtn = document.getElementById('shareScr-btn');
+    const broadcastBtn = document.getElementById('broadcast-btn');
 
     // 最初の接続を行う
     initBtn.addEventListener('click', async() => {
@@ -59,6 +60,17 @@ async function startConf(){
         localVideo.srcObject = localStream;
         localVideo.muted = true;
         await localVideo.play().catch(console.error);
+
+        const changeParam = () => {
+            main.send({
+                type: 'change-params',
+                info: {
+                    oriLang: currentOriLang,
+                    venue: currentVenue,
+                    ip: currentIp,
+                },
+            });
+        }
         
         // roomに参加する
         // ホスト-会場
@@ -96,6 +108,8 @@ async function startConf(){
                         if (self === data.info.venue) {
                             broadcasting = true;
                             localStream.getAudioTracks()[0].enabled = true;
+                        } else {
+                            broadcasting = false;
                         }
                     }
 
@@ -109,25 +123,10 @@ async function startConf(){
                     
                     break;
                 
-                // case 'change-main':
-                //     currentVenue = data.info.venue;
-                //     currentOriLang = data.info.oriLang;
-                //     if (self === data.info.venue) {
-                //         broadcasting = true;
-                //         localStream.getAudioTracks()[0].enabled = true;
-                //     }
-                //     break;
-            
                 default:
                     break;
             }
         })
-
-        // 会場-オーディエンス
-        // aud = window.Peer.joinRoom('audience', {
-        //     mode: 'sfu',
-        //     stream: localStream,
-        // });
 
     });
 
@@ -146,20 +145,32 @@ async function startConf(){
             await localVideo.play().then(()=> {
                 main_.replaceStream(combinedStream);
                 screanStream = combinedStream;
-                // if (broadcasting) {
-                //     aud_.replaceStream(combinedStream);
-                // }
             }).catch(console.error);
             
             scrStream.getVideoTracks()[0].onended = async () => {
                 localStream = await getMediaStream({video: true, audio: true});
                 localVideo.srcObject = localStream;
                 main_.replaceStream(localStream);
-                // if (broadcasting) {
-                //     aud_.replaceStream(localStream);
-                // }
                 scrStream = null;
             };
+
+            broadcastBtn.addEventListener('click', () => {
+                if (!broadcasting) {
+                    currentVenue = self;
+                    broadcasting = true;
+                    broadcastBtn.innerText = 'BROADCASTING NOW...';
+                    broadcastBtn.classList.add('is-danger');
+                    broadcastBtn.classList.remove('is-primary');
+                    changeParam();
+                } else {
+                    currentVenue = 'venue0';
+                    broadcasting = false;
+                    broadcastBtn.innerText = 'BROADCAST';
+                    broadcastBtn.classList.add('is-primary');
+                    broadcastBtn.classList.remove('is-danger');
+                    changeParam();
+                }
+            });
         });
     });
 };

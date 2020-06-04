@@ -6,8 +6,8 @@ async function startConf(){
     // 通訳者ごとにPeerIDを作成する
     const self = location.hash ? `ip${location.hash.replace('#', '')}` : 'ip1';
     let ips = [self];
-    let asking = false;
     let acceptance;
+    let acceptLimit;
 
     // 音声参照用の変数を用意しておく
     let localAudio;
@@ -16,21 +16,20 @@ async function startConf(){
     let currentVenue = 'venue0';
     let currentIp = 'ip1';
 
-    const mainRemote = document.getElementById('mainVideo');
-    const initBtn = document.getElementById('initBtn');
-    const connectBtn = document.getElementById('connectBtn');
+    const mainRemote = document.getElementById('main-video');
+    const initBtn = document.getElementById('init-btn');
+    const connectBtn = document.getElementById('connect-btn');
 
     const msgs = [];
     const msg = document.getElementById('msg');
-    const sendMsgBtn = document.getElementById('sendMsgBtn');
+    const sendMsgBtn = document.getElementById('sendMsg-btn');
 
-    const handOverBtn = document.getElementById('handOverBtn')
+    const handOverBtn = document.getElementById('handOver-btn');
     const muteBtn = document.getElementById('mute');
     let ipMute = false;
-    let speakingIp = 'ip1';
 
-    const setLang1Btn = document.getElementById('setLang1Btn');
-    const setLang2Btn = document.getElementById('setLang2Btn');
+    const setLang1Btn = document.getElementById('setLang1-btn');
+    const setLang2Btn = document.getElementById('setLang2-btn');
 
     // 最初の接続を行う
     initBtn.addEventListener('click', async() => {
@@ -65,19 +64,56 @@ async function startConf(){
         // マイクを取得する
         localAudio = await getMediaStream({video: false, audio: true});
 
+        const reqestBtn = document.getElementById('request-btn');
+        reqestBtn.addEventListener('click', () => {
+            ip.send({
+                type: 'msg',
+                info: `${self} requests to hand over`,
+            });
+        });
+
+        const acceptBtn = document.getElementById('accept-btn');
+        acceptBtn.addEventListener('click', () => {
+            clearTimeout(acceptance);
+            document.getElementById('hand-modal').classList.toggle('is-active');
+            currentIp = self;
+            ip.send({
+                type: 'hand-accept',
+                to: self,
+            })
+            myTurn = true;
+            getTurn(myTurn);
+        });
+
+        const rejectHandle = () => {
+            clearTimeout(acceptance);
+            ip.send({
+                type: 'hand-reject',
+            })
+            document.getElementById('hand-modal').classList.toggle('is-active');
+        }
+
+        const rejectBtn = document.getElementById('reject-btn');
+        rejectBtn.addEventListener('click', rejectHandle);
+
+        const delBtn = document.getElementById('del-btn');
+        delBtn.addEventListener('click', () => {
+            document.getElementById('hand-modal').classList.toggle('is-active')
+        });
+
         muteBtn.addEventListener('click', () => {
             // ミュートがON => ミュート解除
             if (ipMute) {
-                unmuting()
+                unmuting();
                 ip.send({
                     type: 'ip-unmute',
-                })
+                });
             // ミュートがOFF => ミュート
             } else {
                 muting(false);
                 ip.send({
                     type: 'ip-mute',
-                })
+                });
             }
         });
 
@@ -104,7 +140,7 @@ async function startConf(){
             setLang2Btn.classList.add('is-primary');
             currentOriLang = 'L1';
             changeParam();
-        })
+        });
 
         // roomに参加する
         // 会場からの映像・音声を受け取るチャンネル
@@ -131,11 +167,13 @@ async function startConf(){
                 }
                 getTurn(myTurn);
             }
-        })
+        });
 
         ip.on('stream', async stream => {
-            mainRemote.srcObject = stream;
-            await mainRemote.play().catch(console.error);
+            if (stream.peerId === 'host') {
+                mainRemote.srcObject = stream;
+                await mainRemote.play().catch(console.error);
+            }
         });
 
         // 他の通訳が参加したことを検知する
@@ -146,7 +184,7 @@ async function startConf(){
                 ips.sort();
             }
             getTurn(myTurn);
-        })
+        });
 
         // 接続が減った場合の処理
         ip.on('peerLeave', peerId => {
@@ -156,9 +194,11 @@ async function startConf(){
                     return val !== peerId;
                 });
                 ips.sort();
-                if (peerId === speakingIp) {
-                    speakingIp = ips[0];
-                    if (speakingIp === self) {
+                console.log(ips)
+                if (peerId === currentIp) {
+                    currentIp = ips[0];
+                    console.log(currentIp);
+                    if (currentIp === self) {
                         myTurn = true;
                     }
                 }
@@ -178,7 +218,6 @@ async function startConf(){
                 case 'change-params':
                     if (data.info.venue !== currentVenue) {
                         currentVenue = data.info.venue;
-                        // selectMain();
                     }
                     if (data.info.oriLang !== currentOriLang) {
                         currentOriLang = data.info.oriLang;
@@ -204,24 +243,37 @@ async function startConf(){
                     } else {
                         myTurn = false;
                     }
-                    getTurn(myTurn)
+                    getTurn(myTurn);
                     break;
 
                 case 'hand-over':
                     if (data.to === self) {
                         acceptance = setTimeout(rejectHandle, 10000);
-                        asking = true;
-                        handOverBtn.disabled = false;
-                        handOverBtn.classList.remove('is-black')
-                        handOverBtn.classList.add('is-white')
+                        document.getElementById('hand-modal').classList.toggle('is-active');
                     }
+                    break;
+
+                case 'hand-accept':
+                    myTurn = false;
+                    getTurn(myTurn);
+                    handOverBtn.innerText = 'HAND OVER';
+                    handOverBtn.classList.add('is-black');
+                    handOverBtn.classList.remove('is-white');
+                    break;
+
+                case 'hand-reject':
+                    msg.innerText = updateDisplayText(msgs, `${src} cannot accept right now`, 20);
+                    handOverBtn.disabled = false;
+                    handOverBtn.innerText = 'HAND OVER';
+                    handOverBtn.classList.add('is-black');
+                    handOverBtn.classList.remove('is-white');
 
                 default:
                     break;
             }
         });
 
-        sendMsg.addEventListener('keyup', ev => {
+        sendMsg.addEventListener('keyup', () => {
             if (ev.keyCode === 13) {
                 const text = document.getElementById('sendMsg').value;
                 msg.innerText = updateDisplayText(msgs, text, 20);
@@ -231,7 +283,7 @@ async function startConf(){
                 });
                 document.getElementById('sendMsg').value = '';
             }
-        })
+        });
 
         sendMsgBtn.addEventListener('click', () => {
             const text = document.getElementById('sendMsg').value;
@@ -241,44 +293,20 @@ async function startConf(){
                 info: text,
             });
             document.getElementById('sendMsg').value = '';
-        })
+        });
 
         handOverBtn.addEventListener('click', () => {
-            if (!asking) {
-                const targetIp = self === 'ip1' ? 'ip2' : 'ip1';
-                ip.send({
-                    type: 'hand-over',
-                    from: self,
-                    to: targetIp,
-                });
-            } else {
-                clearTimeout(acceptance);
-                currentIp = self;
-                changeParam();
-                asking = false;
-                myTurn = true;
-                getTurn(myTurn)
-                // ip.send({
-                //     type: 'hand-over-ok',
-                //     to: self,
-                // });
-                handOverBtn.classList.add('is-black')
-                handOverBtn.classList.remove('is-white')
-            }
-        })
-
-        const rejectHandle = () => {
-            console.log('reject')
+            const targetIp = self === 'ip1' ? 'ip2' : 'ip1';
             ip.send({
-                type: 'msg',
-                info: `${self} cannot accept right now`
-            })
-            asking = false;
+                type: 'hand-over',
+                from: self,
+                to: targetIp,
+            });
             handOverBtn.disabled = true;
-            handOverBtn.classList.add('is-black')
-            handOverBtn.classList.remove('is-white')
-            console.log('reject end')
-        }
+            handOverBtn.innerText = 'Waiting...'
+            handOverBtn.classList.remove('is-black');
+            handOverBtn.classList.add('is-white');
+        });
 
     });
 
@@ -288,7 +316,7 @@ async function startConf(){
         localAudio.getAudioTracks()[0].enabled = false;
         muteBtn.classList.add('is-danger');
         msg.innerText = updateDisplayText(msgs, '@host speaking', 20);
-    }
+    };
 
     const setOriL1 = () => {
         currentOriLang = 'L1';
@@ -298,7 +326,7 @@ async function startConf(){
         setLang1Btn.classList.remove('is-primary');
         setLang2Btn.classList.add('is-primary');
         msg.innerText = updateDisplayText(msgs, 'lang toggled by @host', 20);
-    }
+    };
 
     const setOriL2 = () => {
         currentOriLang = 'L2';
@@ -308,7 +336,7 @@ async function startConf(){
         setLang1Btn.classList.add('is-primary');
         setLang2Btn.classList.remove('is-primary');
         msg.innerText = updateDisplayText(msgs, 'lang toggled by @host', 20);
-    }
+    };
 
     const getTurn = (turn) => {
         console.log(turn)
@@ -327,14 +355,15 @@ async function startConf(){
             setLang2Btn.disabled = true;
             handOverBtn.disabled = true;
         }
-    }
+    };
+
     const muting = (lock) => {
         ipMute = true;
         localAudio.getAudioTracks()[0].enabled = false;
         muteBtn.classList.add('is-danger');
         muteBtn.disabled = lock;
         muteLock = lock;
-    }
+    };
     
     const unmuting = () => {
         ipMute = false;
@@ -342,7 +371,8 @@ async function startConf(){
         muteBtn.classList.remove('is-danger');
         muteBtn.disabled = false;
         muteLock = false;
-    }
+    };
+
 };
 
 (async function(){

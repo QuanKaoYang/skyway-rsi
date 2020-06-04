@@ -7,17 +7,16 @@ async function startConf(){
     let myLang = location.hash === '#L2' ? 'L2' : 'L1';
     // let currentOriLang = 'L1';
 
-    const initBtn = document.getElementById('initBtn');
-    const connectBtn = document.getElementById('connectBtn');
+    const initBtn = document.getElementById('init-btn');
+    const connectBtn = document.getElementById('connect-btn');
 
-    const mainVideo = document.getElementById('mainVideo');
-    // const subAudio = document.getElementById('subAudio');
+    const mainVideo = document.getElementById('main-video');
 
-    const setLang1Btn = document.getElementById('lang1Btn');
-    const setLang2Btn = document.getElementById('lang2Btn');
+    const setLang1Btn = document.getElementById('lang1-btn');
+    const setLang2Btn = document.getElementById('lang2-btn');
 
-    const reloadBtn = document.getElementById('reloadBtn');
-    const fullScrBtn = document.getElementById('fullScrBtn');
+    const reloadBtn = document.getElementById('reload-btn');
+    const fullScrBtn = document.getElementById('fullScr-btn');
 
     if (myLang === 'L2') {
         setLang1Btn.classList.remove('is-primary');
@@ -63,26 +62,8 @@ async function startConf(){
 
         // 会場からの音・通訳からの音をそれぞれAudioのソースに設定
         aud.on('stream', async stream => {
-            // if (stream.peerId.startsWith('venue')){
-            //     mainVideo.srcObject = stream;
-            // } else if (stream.peerId.startsWith('ip')){
-            //     subAudio.srcObject = stream;
-            // } else if (stream.peerId.startsWith('host') && stream !== null){
-            //     subAudio.srcObject = stream;
-            // }
             mainVideo.srcObject = stream;
         });
-
-        // aud.on('data', ({ src, data }) => {
-        //     switch (data.type) {
-        //         case 'change-params':
-        //             currentOriLang = data.info.oriLang;
-        //             selectChanel(data.info.oriLang);
-
-        //         default:
-        //             break;
-        //     }
-        // })
 
         const changeLang = (lang) => {
             if (myLang === lang) {
@@ -114,7 +95,7 @@ async function startConf(){
         reloadBtn.addEventListener('click', () => {
             console.log('reload');
             aud.close();
-            window.Peer.joinRoom('audience', {
+            aud = window.Peer.joinRoom('audience', {
                 mode: 'sfu',
                 stream: null,
             });
@@ -133,16 +114,6 @@ async function startConf(){
                 console.error;
             });
     });
-
-    // const selectChanel = (ch) => {
-    //     if (myLang === ch) {
-    //         mainVideo.muted = false;
-    //         subAudio.muted = true;
-    //     } else {
-    //         mainVideo.muted = true;
-    //         subAudio.muted = false;
-    //     }
-    // }
 
 };
 
