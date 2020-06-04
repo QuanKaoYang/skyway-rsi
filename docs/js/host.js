@@ -204,11 +204,11 @@ async function startConf() {
             stream: localStream,
         });
 
-        aud1.on('open', () => {
-            if (hostMuted) {
-                aud1.replaceStream(null);
-            }
-        });
+        // aud1.on('open', () => {
+        //     if (hostMuted) {
+        //         aud1.replaceStream(null);
+        //     }
+        // });
 
         // aud roomに参加者が入ったとき
         // ビデオに関する処理は stream のイベントで処理をする
@@ -222,11 +222,11 @@ async function startConf() {
             stream: localStream,
         });
 
-        aud2.on('open', () => {
-            if (hostMuted) {
-                aud2.replaceStream(null);
-            }
-        });
+        // aud2.on('open', () => {
+        //     if (hostMuted) {
+        //         aud2.replaceStream(null);
+        //     }
+        // });
 
         // aud roomに参加者が入ったとき
         // ビデオに関する処理は stream のイベントで処理をする

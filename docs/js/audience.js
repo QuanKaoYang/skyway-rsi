@@ -71,7 +71,7 @@ async function startConf(){
             } else {
                 myLang = lang;
                 aud.close();
-                aud.joinRoom(`audience${myLang}`, {
+                aud = window.Peer.joinRoom(`audience${myLang}`, {
                     mode: 'sfu',
                     stream: null,
                 });
