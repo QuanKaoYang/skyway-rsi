@@ -104,16 +104,16 @@ async function startConf(){
     });
 
 
-    fullScrBtn.addEventListener('click', () => {
-        console.log('reload');
-        mainVideo.requestFullscreen()
-            .then(()=> {
-                console.log('full');
-            })
-            .catch(() => {
-                console.error;
-            });
-    });
+    // fullScrBtn.addEventListener('click', () => {
+    //     console.log('reload');
+    //     mainVideo.requestFullscreen()
+    //         .then(()=> {
+    //             console.log('full');
+    //         })
+    //         .catch(() => {
+    //             console.error;
+    //         });
+    // });
 
 };
 
