@@ -253,10 +253,9 @@ async function startConf() {
         }
 
         const setStream = () => {
-            let subStream_ = subStream;
+            // let mainStream_ = mainStream === undefined ? localStream : mainStream;
+            // let subStream_ = subStream === undefined ? localStream : subStream;
             if (currentVenue === 'venue0') {
-                mainStream = localStream;
-                subStream = localStream;
                 ip.replaceStream(localStream);
                 aud1.replaceStream(localStream);
                 aud2.replaceStream(localStream);
@@ -266,9 +265,15 @@ async function startConf() {
                         mainStream = rs;
                     }
                 }
+                if (mainStream === undefined) {
+                    mainStream = localStream;
+                }
+                if (subStream === undefined) {
+                    subStream = localStream;
+                }
                 ip.replaceStream(mainStream);
                 subStream = new MediaStream(
-                    [...mainStream.getVideoTracks(), ...subStream_.getAudioTracks()]
+                    [...mainStream.getVideoTracks(), ...subStream.getAudioTracks()]
                 );
                 if (currentOriLang === 'L1') {
                     aud1.replaceStream(mainStream);

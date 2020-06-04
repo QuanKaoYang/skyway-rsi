@@ -16,7 +16,7 @@ async function startConf(){
     const setLang2Btn = document.getElementById('lang2-btn');
 
     const reloadBtn = document.getElementById('reload-btn');
-    const fullScrBtn = document.getElementById('fullScr-btn');
+    // const fullScrBtn = document.getElementById('fullScr-btn');
 
     if (myLang === 'L2') {
         setLang1Btn.classList.remove('is-primary');
@@ -62,6 +62,7 @@ async function startConf(){
 
         // 会場からの音・通訳からの音をそれぞれAudioのソースに設定
         aud.on('stream', async stream => {
+            console.log(stream)
             mainVideo.srcObject = stream;
         });
 
