@@ -88,7 +88,7 @@ async function startConf() {
         main.on('stream', async stream => {
             const subPeerid = stream.peerId;
             if (subPeerid.startsWith('venue')) {
-                document.getElementById(`setVenue${subPeerid.substr(-1)}`).disabled = false;
+                document.getElementById(`set-venue${subPeerid.substr(-1)}`).disabled = false;
                 document.getElementById(subPeerid).srcObject = stream;
                 await document.getElementById(subPeerid).play().catch(console.error)
             }
@@ -101,7 +101,7 @@ async function startConf() {
             const subPeerid = peerId;
             if (subPeerid.startsWith('venue')) {
                 document.getElementById(subPeerid).srcObject = null;
-                document.getElementById(`setVenue${subPeerid.substr(-1)}`).disabled = true;
+                document.getElementById(`set-venue${subPeerid.substr(-1)}`).disabled = true;
             }
         });
 
