@@ -82,7 +82,10 @@ async function startConf(){
         reqestBtn.addEventListener('click', () => {
             ip.send({
                 type: 'msg',
-                info: `${self} requests to hand over`,
+                info: {
+                    text: `${self} requests to hand over`,
+                    color: 'bg-yellow'
+                }
             });
         });
 
@@ -166,16 +169,18 @@ async function startConf(){
 
         ip.on('open', () => {
             if (ip.members > 0) {
-                ip.send({
-                    type: 'initial-check',
-                    who: ip.members[0],
-                })
                 ip.members.map(val => {
                     if (val !== 'host') {
                         ips.push(val);
                     };
                 });
+                ip.send({
+                    type: 'initial-check',
+                    who: ip.members[0],
+                    exeption: ips.length === 1 ? true : false,
+                })
             }
+            console.log(ips)
             myTurn = ips.length === 1? true : false;
             getTurn()
         });

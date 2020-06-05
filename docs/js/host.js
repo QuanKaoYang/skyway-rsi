@@ -131,7 +131,7 @@ async function startConf() {
                 if (currentVenue === subPeerid) {
                     currentVenue = 'venue0';
                     // document.getElementById(`set-venue${subPeerid.substr(-1)}`).classList.remove('is-primary');
-                    document.getElementById(`set-venue0`).click();
+                    document.getElementById(`setNoVenue`).click();
                     changeParam({toMain: true, tuIp: true})
                     setStream();
                 }
@@ -200,6 +200,9 @@ async function startConf() {
             switch(data.type) {
                 case 'initial-check':
                     if (data.who === self) {
+                        if (data.exception) {
+                            currentIp = src;
+                        }
                         changeParam({toMain: false, toIp: true});
                     }
                     break;
