@@ -15,7 +15,7 @@ async function startConf(){
     const setLang1Btn = document.getElementById('lang1-btn');
     const setLang2Btn = document.getElementById('lang2-btn');
 
-    const reloadBtn = document.getElementById('reload-btn');
+    // const reloadBtn = document.getElementById('reload-btn');
     // const fullScrBtn = document.getElementById('fullScr-btn');
 
     if (myLang === 'L2') {
@@ -55,16 +55,21 @@ async function startConf(){
         
         // 会場&通訳-オーディエンス
         // オーディエンスからは配信する内容がないので、受信専用としてstreamはnull
-        aud = window.Peer.joinRoom(`audience${myLang}`, {
-            mode: 'sfu',
-            stream: null,
-        });
-
-        // 会場からの音・通訳からの音をそれぞれAudioのソースに設定
-        aud.on('stream', async stream => {
-            console.log(stream)
-            mainVideo.srcObject = stream;
-        });
+        let audCreation = () => {
+            console.log('created')
+            aud = window.Peer.joinRoom(`audience${myLang}`, {
+                mode: 'sfu',
+                stream: null,
+            });
+    
+            // 会場からの音・通訳からの音をそれぞれAudioのソースに設定
+            aud.on('stream', async stream => {
+                console.log(stream)
+                mainVideo.srcObject = stream;
+            });
+        }
+        
+        audCreation();
 
         const changeLang = (lang) => {
             if (myLang === lang) {
@@ -72,10 +77,7 @@ async function startConf(){
             } else {
                 myLang = lang;
                 aud.close();
-                aud = window.Peer.joinRoom(`audience${myLang}`, {
-                    mode: 'sfu',
-                    stream: null,
-                });
+                audCreation();
                 if (myLang === 'L1') {
                     setLang1Btn.classList.add('is-primary');
                     setLang2Btn.classList.remove('is-primary')
@@ -93,14 +95,14 @@ async function startConf(){
             changeLang('L2');
         });
     
-        reloadBtn.addEventListener('click', () => {
-            console.log('reload');
-            aud.close();
-            aud = window.Peer.joinRoom('audience', {
-                mode: 'sfu',
-                stream: null,
-            });
-        });
+        // reloadBtn.addEventListener('click', () => {
+        //     console.log('reload');
+        //     aud.close();
+        //     aud = window.Peer.joinRoom('audience', {
+        //         mode: 'sfu',
+        //         stream: null,
+        //     });
+        // });
     
     });
 

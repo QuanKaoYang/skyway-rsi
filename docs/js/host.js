@@ -24,7 +24,7 @@ async function startConf() {
     // 言語設定用の変数
     let hostMuted = true;
     const setLang0Btn = document.getElementById('setLang0-btn');
-    const muteLang0Btn = document.getElementById('muteLang0-btn');
+    // const muteLang0Btn = document.getElementById('muteLang0-btn');
     const setLang1Btn = document.getElementById('setLang1-btn');
     const setLang2Btn = document.getElementById('setLang2-btn');
 
@@ -49,6 +49,19 @@ async function startConf() {
         initBtn.disabled = true;
         createBtn.disabled = false;
     });
+
+    document.getElementById('submit-btn').addEventListener('click', () => {
+        const name = document.getElementById('name')
+        const user = document.getElementById('user')
+        const pw = document.getElementById('password')
+        login({
+            name,
+            user,
+            pw
+        }).then(t => {
+            console.log(t);
+        });
+    })
 
     createBtn.addEventListener('click', async () => {
         if (!window.Peer.open) {
@@ -298,7 +311,6 @@ async function startConf() {
                 subStream = new MediaStream(
                     [...mainStream.getVideoTracks(), ...subStream.getAudioTracks()]
                 );
-                console.log(subStream);
                 if (currentOriLang === 'L1') {
                     aud1.replaceStream(mainStream);
                     aud2.replaceStream(subStream);
@@ -389,23 +401,23 @@ async function startConf() {
             setOriL0();
         });
 
-        muteLang0Btn.addEventListener('click', () => {
-            if (hostMuted) {
-                localStream.getAudioTracks()[0].enabled = true;
-                muteLang0Btn.classList.remove('is-danger');
-                hostMuted = false;
-                main.send({
-                    type: 'host-unmute',
-                });
-            } else {
-                localStream.getAudioTracks()[0].enabled = false;
-                muteLang0Btn.classList.add('is-danger');
-                hostMuted = true;
-                main.send({
-                    type: 'host-mute',
-                });
-            }
-        })
+        // muteLang0Btn.addEventListener('click', () => {
+        //     if (hostMuted) {
+        //         localStream.getAudioTracks()[0].enabled = true;
+        //         muteLang0Btn.classList.remove('is-danger');
+        //         hostMuted = false;
+        //         main.send({
+        //             type: 'host-unmute',
+        //         });
+        //     } else {
+        //         localStream.getAudioTracks()[0].enabled = false;
+        //         muteLang0Btn.classList.add('is-danger');
+        //         hostMuted = true;
+        //         main.send({
+        //             type: 'host-mute',
+        //         });
+        //     }
+        // })
 
         setLang1Btn.addEventListener('click', () => {
             setOriL1();

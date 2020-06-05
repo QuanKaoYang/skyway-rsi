@@ -174,7 +174,7 @@ async function startConf(){
         
         broadcastBtn.addEventListener('click', ev => {
             if (!broadcasting) {
-                if (ev.isTrusted !== true){
+                if (ev.isTrusted === true){
                     currentVenue = self;
                     changeParam();
                 }
@@ -183,7 +183,7 @@ async function startConf(){
                 broadcastBtn.classList.add('is-danger');
                 broadcastBtn.classList.remove('is-primary');
             } else {
-                if (ev.isTrusted !== true){
+                if (ev.isTrusted === true){
                     currentVenue = 'venue0';
                     changeParam();
                 }

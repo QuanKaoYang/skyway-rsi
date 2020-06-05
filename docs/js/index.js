@@ -37,6 +37,26 @@ async function getSkyKey(key) {
     })
 }
 
+async function login(data) {
+    return new Promise(resolve => {
+        fetch(`https://sheepy-meme.builtwithdark.com/meebaalogin`, {
+            method: 'POST',
+            headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+            mode: 'cors',
+            body: data,
+        }).then(res => {
+            if (res.status === 200) {
+                res.text().then(t => {
+                    resolve(t);
+                })
+            }
+        })
+    })
+}
+
 async function getMediaStream(getters) {
     let foundAudio = false;
     let foundCamera = false;
