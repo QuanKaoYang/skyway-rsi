@@ -131,11 +131,11 @@ async function startConf(){
                         if (self === data.info.venue) {
                             broadcastBtn.click();
                             // broadcasting = true;
-                            // localStream.getAudioTracks()[0].enabled = true;
                         } else {
                             if (broadcasting) {
                                 broadcastBtn.click();
                             }
+                            localStream.getAudioTracks()[0].enabled = false;
                         }
                     }
 
@@ -186,6 +186,7 @@ async function startConf(){
                     currentVenue = self;
                     changeParam();
                 }
+                localStream.getAudioTracks()[0].enabled = true;
                 broadcasting = true;
                 broadcastBtn.innerText = 'BROADCASTING NOW...';
                 broadcastBtn.classList.add('is-danger');
@@ -194,6 +195,7 @@ async function startConf(){
                 if (ev.isTrusted === true){
                     currentVenue = 'venue0';
                     changeParam();
+                    localStream.getAudioTracks()[0].enabled = false;
                 }
                 broadcasting = false;
                 broadcastBtn.innerText = 'BROADCAST';

@@ -121,6 +121,13 @@ async function startConf() {
             if (subPeerid.startsWith('venue')) {
                 document.getElementById(subPeerid).srcObject = null;
                 document.getElementById(`set-venue${subPeerid.substr(-1)}`).disabled = true;
+                if (currentVenue === subPeerid) {
+                    currentVenue = 'venue0';
+                    // document.getElementById(`set-venue${subPeerid.substr(-1)}`).classList.remove('is-primary');
+                    document.getElementById(`set-venue0`).click();
+                    changeParam({toMain: true, tuIp: true})
+                    setStream();
+                }
             }
         });
 
@@ -138,6 +145,7 @@ async function startConf() {
                     status.innerHTML = coloredLog(statuses, `${src} changed params`, 40, 'font-blue');
                     if (data.info.venue !== currentVenue) {
                         currentVenue = data.info.venue;
+                        changeParam({toMain: false, toIp: true})
                         setVenueBtnColor(currentVenue);
                     }
                     if (data.info.oriLang !== currentOriLang) {
@@ -194,6 +202,7 @@ async function startConf() {
                     status.innerHTML = coloredLog(statuses, `${src} changed params`, 40);
                     if (data.info.venue !== currentVenue) {
                         currentVenue = data.info.venue;
+                        changeParam({toMain: true, toIp: false});
                         setVenueBtnColor(currentVenue);
                         // ip.replaceStream(mainStream);
                     }

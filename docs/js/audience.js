@@ -67,6 +67,7 @@ async function startConf(){
             aud.on('stream', async stream => {
                 console.log(stream)
                 mainVideo.srcObject = stream;
+                await mainVideo.play().catch(console.error)
             });
         }
         
