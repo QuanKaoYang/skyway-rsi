@@ -16,26 +16,34 @@ async function startConf(){
     let broadcasting = false;
 
     const localVideo = document.getElementById(self);
-    const initBtn = document.getElementById('init-btn');
     const connectBtn = document.getElementById('connect-btn');
 
     const shareScrBtn = document.getElementById('shareScr-btn');
     const broadcastBtn = document.getElementById('broadcast-btn');
 
     // 最初の接続を行う
-    initBtn.addEventListener('click', async() => {
-        // Peer接続のためのコンストラクタ
-        window.Peer = new Peer(self, {
-            key: document.getElementById('apikey').value,
-            debug: 1,
+    document.getElementById('login-btn').addEventListener('click', () => {
+        const name = document.getElementById('name').value;
+        // const user = document.getElementById('user').value;
+        const pw = document.getElementById('password').value;
+        login({
+            name: name,
+            user: 'venue',
+            pw: pw,
+        }).then(t => {
+            // Peer接続のためのコンストラクタ
+            window.Peer = new Peer(self,{
+                key: t,
+                debug: 1,
+            });
+            document.getElementById('login-msg').innerText = "Login Succeed"
+            setTimeout(() => {
+                connectBtn.disabled = false;
+            }, 1000);
+        }).catch(failed => {
+            document.getElementById('login-msg').innerText = failed
         });
-
-        // ローカルストレージへのAPI Keyを保存しておく
-        window.localStorage.setItem('myskyway', document.getElementById('apikey').value);
-
-        initBtn.disabled = true;
-        connectBtn.disabled = false;
-    });
+    })
 
     // ホストと接続する
     connectBtn.addEventListener('click', async () => {
@@ -198,16 +206,6 @@ async function startConf(){
 };
 
 (async function(){
-    // クエリーストリングが正しければInputボックスに自動入力
-    if (location.search !== '') {
-        console.log(location.search.replace('?key=', ''))
-        key = await getSkyKey(location.search.replace('?key=', ''));
-        document.getElementById('apikey').value = key;
-    // クエリーストリングがなく、ローカルストレージにapikeyが保存されていればInputボックスに自動入力
-    } else if (window.localStorage.getItem('myskyway') !== null) {
-        document.getElementById('apikey').value = window.localStorage.getItem('myskyway'); 
-    }
-    
     console.log('start');
     startConf();
 })();

@@ -16,7 +16,7 @@ async function startConf() {
     // マイク参照用の変数を用意しておく
     let localStream;
 
-    const initBtn = document.getElementById('init-btn');
+    // const initBtn = document.getElementById('init-btn');
     const createBtn = document.getElementById('create-btn');
 
     const venueList = document.querySelectorAll('.venueSel')
@@ -24,7 +24,6 @@ async function startConf() {
     // 言語設定用の変数
     let hostMuted = true;
     const setLang0Btn = document.getElementById('setLang0-btn');
-    // const muteLang0Btn = document.getElementById('muteLang0-btn');
     const setLang1Btn = document.getElementById('setLang1-btn');
     const setLang2Btn = document.getElementById('setLang2-btn');
 
@@ -35,31 +34,25 @@ async function startConf() {
     const msg = document.getElementById('msg')
     const sendMsgBtn = document.getElementById('sendMsg-btn')
 
-    // 最初の接続を行う
-    initBtn.addEventListener('click', async() => {
-        // ID：hostでPeer接続する
-        window.Peer = new Peer(self,{
-            key: document.getElementById('apikey').value,
-            debug: 1,
-        });
-        
-        // ローカルストレージへのAPI Keyを保存しておく
-        window.localStorage.setItem('myskyway', document.getElementById('apikey').value);
-        
-        initBtn.disabled = true;
-        createBtn.disabled = false;
-    });
-
-    document.getElementById('submit-btn').addEventListener('click', () => {
-        const name = document.getElementById('name')
-        const user = document.getElementById('user')
-        const pw = document.getElementById('password')
+    document.getElementById('login-btn').addEventListener('click', () => {
+        const name = document.getElementById('name').value;
+        // const user = document.getElementById('user').value;
+        const pw = document.getElementById('password').value;
         login({
-            name,
-            user,
-            pw
+            name: name,
+            user: 'host',
+            pw: pw,
         }).then(t => {
-            console.log(t);
+            window.Peer = new Peer(self,{
+                key: t,
+                debug: 1,
+            });
+            document.getElementById('login-msg').innerText = "Login Succeed"
+            setTimeout(() => {
+                createBtn.disabled = false;
+            }, 1000);
+        }).catch(failed => {
+            document.getElementById('login-msg').innerText = failed
         });
     })
 
@@ -401,24 +394,6 @@ async function startConf() {
             setOriL0();
         });
 
-        // muteLang0Btn.addEventListener('click', () => {
-        //     if (hostMuted) {
-        //         localStream.getAudioTracks()[0].enabled = true;
-        //         muteLang0Btn.classList.remove('is-danger');
-        //         hostMuted = false;
-        //         main.send({
-        //             type: 'host-unmute',
-        //         });
-        //     } else {
-        //         localStream.getAudioTracks()[0].enabled = false;
-        //         muteLang0Btn.classList.add('is-danger');
-        //         hostMuted = true;
-        //         main.send({
-        //             type: 'host-mute',
-        //         });
-        //     }
-        // })
-
         setLang1Btn.addEventListener('click', () => {
             setOriL1();
         });
@@ -431,15 +406,6 @@ async function startConf() {
 };
 
 (async function(){
-    // クエリーストリングが正しければInputボックスに自動入力
-    if (location.search !== '') {
-        console.log(location.search.replace('?key=', ''))
-        key = await getSkyKey(location.search.replace('?key=', ''));
-        document.getElementById('apikey').value = key;
-    // クエリーストリングがなく、ローカルストレージにapikeyが保存されていればInputボックスに自動入力
-    } else if (window.localStorage.getItem('myskyway') !== null) {
-        document.getElementById('apikey').value = window.localStorage.getItem('myskyway'); 
-    }
     console.log('start');
     startConf();
 })();

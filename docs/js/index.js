@@ -38,21 +38,24 @@ async function getSkyKey(key) {
 }
 
 async function login(data) {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
         fetch(`https://sheepy-meme.builtwithdark.com/meebaalogin`, {
             method: 'POST',
             headers: {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
+                    'Content-Type': 'text/plain',
                 },
             mode: 'cors',
-            body: data,
+            body: JSON.stringify(data),
         }).then(res => {
             if (res.status === 200) {
                 res.text().then(t => {
                     resolve(t);
                 })
+            } else {
+                reject("Login Failed");
             }
+        }).catch(() => {
+            reject("Login Failed")
         })
     })
 }

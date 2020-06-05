@@ -5,38 +5,39 @@ async function startConf(){
     // 会場とデフォルトのチャネル別のPeerIDを作成するための接尾辞
     // ハッシュ# 付きのURLを使用する予定
     let myLang = location.hash === '#L2' ? 'L2' : 'L1';
-    // let currentOriLang = 'L1';
 
-    const initBtn = document.getElementById('init-btn');
-    const connectBtn = document.getElementById('connect-btn');
 
     const mainVideo = document.getElementById('main-video');
-
+    const connectBtn = document.getElementById('connect-btn');
     const setLang1Btn = document.getElementById('lang1-btn');
     const setLang2Btn = document.getElementById('lang2-btn');
-
-    // const reloadBtn = document.getElementById('reload-btn');
-    // const fullScrBtn = document.getElementById('fullScr-btn');
 
     if (myLang === 'L2') {
         setLang1Btn.classList.remove('is-primary');
         setLang2Btn.classList.add('is-primary');
     }
 
-    // 最初の接続を行う
-    initBtn.addEventListener('click', async() => {
-        // Peer接続のためのコンストラクタ
-        window.Peer = new Peer({
-            key: document.getElementById('apikey').value,
-            debug: 1,
+    document.getElementById('login-btn').addEventListener('click', () => {
+        const name = document.getElementById('name').value;
+        // const user = document.getElementById('user').value;
+        const pw = document.getElementById('password').value;
+        login({
+            name: name,
+            user: 'audience',
+            pw: pw,
+        }).then(t => {
+            window.Peer = new Peer({
+                key: t,
+                debug: 1,
+            });
+            document.getElementById('login-msg').innerText = "Login Succeed"
+            setTimeout(() => {
+                connectBtn.disabled = false;
+            }, 1000);
+        }).catch(failed => {
+            document.getElementById('login-msg').innerText = failed
         });
-
-        // ローカルストレージへのAPI Keyを保存しておく
-        window.localStorage.setItem('myskyway', document.getElementById('apikey').value);
-
-        initBtn.disabled = true;
-        connectBtn.disabled = false;
-    });
+    })
 
     // ホストと接続する
     connectBtn.addEventListener('click', async () => {
@@ -94,42 +95,10 @@ async function startConf(){
         setLang2Btn.addEventListener('click', () => {
             changeLang('L2');
         });
-    
-        // reloadBtn.addEventListener('click', () => {
-        //     console.log('reload');
-        //     aud.close();
-        //     aud = window.Peer.joinRoom('audience', {
-        //         mode: 'sfu',
-        //         stream: null,
-        //     });
-        // });
-    
     });
-
-
-    // fullScrBtn.addEventListener('click', () => {
-    //     console.log('reload');
-    //     mainVideo.requestFullscreen()
-    //         .then(()=> {
-    //             console.log('full');
-    //         })
-    //         .catch(() => {
-    //             console.error;
-    //         });
-    // });
-
 };
 
 (async function(){
-    // クエリーストリングが正しければInputボックスに自動入力
-    if (location.search !== '') {
-        console.log(location.search.replace('?key=', ''))
-        key = await getSkyKey(location.search.replace('?key=', ''));
-        document.getElementById('apikey').value = key;
-    // クエリーストリングがなく、ローカルストレージにapikeyが保存されていればInputボックスに自動入力
-    } else if (window.localStorage.getItem('myskyway') !== null) {
-        document.getElementById('apikey').value = window.localStorage.getItem('myskyway'); 
-    }
     console.log('start');
     startConf();
 })();
