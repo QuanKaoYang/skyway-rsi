@@ -7,6 +7,7 @@ let mainStream;
 let subStream;
 
 async function startConf() {
+    const self = 'host'
     // 言語と会場の初期設定
     let currentOriLang = 'L1';
     let currentVenue = 'venue0';
@@ -37,7 +38,7 @@ async function startConf() {
     // 最初の接続を行う
     initBtn.addEventListener('click', async() => {
         // ID：hostでPeer接続する
-        window.Peer = new Peer('host',{
+        window.Peer = new Peer(self,{
             key: document.getElementById('apikey').value,
             debug: 1,
         });
@@ -77,10 +78,21 @@ async function startConf() {
             stream: null,
         });
 
+        // mainに先に参加者がいた場合、ステータスを統一する
+        main.on('open', () => {
+            if (main.members.length > 0) {
+                main.send({
+                    type: 'initial-check',
+                    who: main.members[0],
+                });
+            }
+        })
+
         // main roomに参加者が入ったとき
         // ビデオに関する処理は stream のイベントで処理をする
         main.on('peerJoin', peerId => {
-            status.innerText = updateDisplayText(statuses, `Main Joined: ${peerId}`, 40);
+            // status.innerText = updateDisplayText(statuses, `Main Joined: ${peerId}`, 40);
+            status.innerHTML = coloredLog(statuses, `Main Joined: ${peerId}`, 40);
             changeParam({toMain: true, toIp: false});
         });
 
@@ -97,7 +109,8 @@ async function startConf() {
         // main roomから参加者が減った時
         main.on('peerLeave', peerId => {
             console.log(`Venue Left: ${peerId}`);
-            status.innerText = updateDisplayText(statuses, `Main Left: ${peerId}`, 40);
+            // status.innerText = updateDisplayText(statuses, `Main Left: ${peerId}`, 40);
+            status.innerHTML = coloredLog(statuses, `Main Left: ${peerId}`, 40, 'font-red');
             const subPeerid = peerId;
             if (subPeerid.startsWith('venue')) {
                 document.getElementById(subPeerid).srcObject = null;
@@ -108,8 +121,15 @@ async function startConf() {
         main.on('data', ({src, data}) => {
             console.log(data);
             switch (data.type) {
+                case 'initial-check':
+                    if (data.who === self) {
+                        changeParam({toMain: true, toIp: false});
+                    }
+                    break;
+
                 case 'change-params':
-                    status.innerText = updateDisplayText(statuses, `${src} changed params`, 40);
+                    // status.innerText = updateDisplayText(statuses, `${src} changed params`, 40);
+                    status.innerHTML = coloredLog(statuses, `${src} changed params`, 40, 'font-blue');
                     if (data.info.venue !== currentVenue) {
                         currentVenue = data.info.venue;
                         setVenueBtnColor(currentVenue);
@@ -135,6 +155,15 @@ async function startConf() {
             stream: mainStream,
         });
 
+        ip.on('open', () => {
+            if (ip.members > 0) {
+                ip.send({
+                    type: 'initial-check',
+                    who: ip.members[0],
+                });
+            }
+        })
+
         ip.on('peerJoin', () => {
             changeParam({toMain: false, toIp: true});
         })
@@ -142,14 +171,21 @@ async function startConf() {
         ip.on('stream', stream => {
             if (stream.peerId === currentIp) {
                 subStream = stream;
+                console.log(`subStream set ${stream.peerId}`)
             }
         })
 
         ip.on('data', ({src, data}) => {
             switch(data.type) {
+                case 'initial-check':
+                    if (data.who === self) {
+                        changeParam({toMain: false, toIp: true});
+                    }
+                    break;
                 // 言語の切り替え
                 case 'change-params':
-                    status.innerText = updateDisplayText(statuses, `${src} changed params`, 40);
+                    // status.innerText = updateDisplayText(statuses, `${src} changed params`, 40);
+                    status.innerHTML = coloredLog(statuses, `${src} changed params`, 40);
                     if (data.info.venue !== currentVenue) {
                         currentVenue = data.info.venue;
                         setVenueBtnColor(currentVenue);
@@ -166,7 +202,8 @@ async function startConf() {
                     break;
 
                 case 'msg':
-                    msg.innerText = updateDisplayText(msgs, data.info, 40);
+                    // msg.innerText = updateDisplayText(msgs, data.info, 40);
+                    msg.innerHTML = coloredLog(msgs, data.info.text, 40, data.info.color);
                     break;
 
                 default:
@@ -175,27 +212,25 @@ async function startConf() {
             
         })
 
-        sendMsg.addEventListener('keyup', ev => {
-            if (ev.keyCode === 13) {
-                const text = document.getElementById('sendMsg').value;
-                main.send({
-                    type: 'msg',
-                    info: text,
-                });
-                msg.innerText = updateDisplayText(msgs, text, 20);
-                document.getElementById('sendMsg').value = '';
-            }
-        })
-
         sendMsgBtn.addEventListener('click', () => {
             const text = document.getElementById('sendMsg').value;
             ip.send({
                 type: 'msg',
-                info: text,
+                info: {
+                    text,
+                    color: 'font-green'
+                },
             });
-            msg.innerText = updateDisplayText(msgs, text, 20);
+            // msg.innerText = updateDisplayText(msgs, text, 20);
+            msg.innerHTML = coloredLog(msgs, text, 20, 'font-green');
             document.getElementById('sendMsg').value = '';
         });
+
+        sendMsg.addEventListener('keyup', ev => {
+            if (ev.keyCode === 13) {
+                sendMsgBtn.click();
+            }
+        })
 
         // aud 聴衆用
         // hostからも一応は送れるようにしておく
@@ -204,35 +239,25 @@ async function startConf() {
             stream: localStream,
         });
 
-        // aud1.on('open', () => {
-        //     if (hostMuted) {
-        //         aud1.replaceStream(null);
-        //     }
-        // });
-
         // aud roomに参加者が入ったとき
         // ビデオに関する処理は stream のイベントで処理をする
         aud1.on('peerJoin', peerId => {
             console.log(`AudienceL1 Joined: ${peerId}`);
-            status.innerText = updateDisplayText(statuses, `Audience Joined: ${peerId}`, 40);
+            // status.innerText = updateDisplayText(statuses, `Audience Joined: ${peerId}`, 40);
+            status.innerHTML = coloredLog(statuses, `Audience Joined: ${peerId}`, 40, 'font-blue');
         });
 
-        aud2 = window.Peer.joinRoom('audienceL1', {
+        aud2 = window.Peer.joinRoom('audienceL2', {
             mode: 'sfu',
             stream: localStream,
         });
-
-        // aud2.on('open', () => {
-        //     if (hostMuted) {
-        //         aud2.replaceStream(null);
-        //     }
-        // });
 
         // aud roomに参加者が入ったとき
         // ビデオに関する処理は stream のイベントで処理をする
         aud2.on('peerJoin', peerId => {
             console.log(`AudienceL1 Joined: ${peerId}`);
-            status.innerText = updateDisplayText(statuses, `Audience Joined: ${peerId}`, 40);
+        //     status.innerText = updateDisplayText(statuses, `Audience Joined: ${peerId}`, 40);
+            status.innerHTML = coloredLog(statuses, `Audience Joined: ${peerId}`, 40, 'font-blue');
         });
 
         const changeParam = ({toMain, toIp}) => {
@@ -253,8 +278,6 @@ async function startConf() {
         }
 
         const setStream = () => {
-            // let mainStream_ = mainStream === undefined ? localStream : mainStream;
-            // let subStream_ = subStream === undefined ? localStream : subStream;
             if (currentVenue === 'venue0') {
                 ip.replaceStream(localStream);
                 aud1.replaceStream(localStream);
@@ -275,6 +298,7 @@ async function startConf() {
                 subStream = new MediaStream(
                     [...mainStream.getVideoTracks(), ...subStream.getAudioTracks()]
                 );
+                console.log(subStream);
                 if (currentOriLang === 'L1') {
                     aud1.replaceStream(mainStream);
                     aud2.replaceStream(subStream);
@@ -335,7 +359,8 @@ async function startConf() {
             currentVenue = 'venue0';
             hostMuted = false;
             localStream.getAudioTracks()[0].enabled = true;
-            status.innerText = updateDisplayText(statuses, `host unmute`, 40);
+            // status.innerText = updateDisplayText(statuses, `host unmute`, 40);
+            status.innerHTML = coloredLog(statuses, `host unmute`, 40, 'font-green');
             aud1.replaceStream(localStream);
             aud2.replaceStream(localStream);
         }
@@ -389,12 +414,8 @@ async function startConf() {
         setLang2Btn.addEventListener('click', () => {
             setOriL2();
         })
-
-
     });
     // createBtn　ここまで
-
-
 };
 
 (async function(){

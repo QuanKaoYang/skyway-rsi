@@ -4,13 +4,35 @@
 }
 
 pre#console {
-    background-color: rgb(250, 135, 250);
+    background-color: lightgray;
     padding: 3px;
 }
 
 pre#msg {
     background-color: lightgray;
     padding: 3px;
+}
+
+span.font-red {
+    color: red
+}
+
+span.font-blue {
+    color: blue;
+}
+
+span.font-green {
+    color: teal;
+}
+
+
+span.bg-yellow {
+    background-color: yellow;
+}
+
+span.bg-red {
+    background-color: tomato;
+    color: white;
 }
 
 ul.horizon li {
@@ -39,40 +61,12 @@ footer {
     margin: 5px;
 }
 
-/* 通訳用 1 */
+/* 通訳 オーディエンス用 1 */
 .main-vdbox {
     width: 1280px;
     height: 720px;
     margin: 5px;
 }
-
-/* 通訳用 2 */
-/* .mini-vdbox {
-    width: 240px;
-    height: 135px;
-    margin: 5px;
-} */
-
-/* 通訳用 3 */
-/* .currentVdbox {
-    background-color: teal;
-} */
-
-/* オーディエンス用 */
-/* h3.voice {
-    padding: 0.3rem;
-}
-
-h3.selected {
-    background-color: teal;
-    color: white;
-    font-weight: bolder;
-}
-
-h3.muted {
-    color: grey;
-    text-decoration: line-through;
-} */
 
 .hiding {
     visibility: hidden;

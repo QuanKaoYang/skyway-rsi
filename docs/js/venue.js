@@ -79,6 +79,15 @@ async function startConf(){
             stream: localStream,
         });
 
+        main.on('open', () => {
+            if (main.members > 0) {
+                main.send({
+                    type: 'initial-check',
+                    who: main.members[0],
+                });
+            }
+        })
+
         main.on('stream', async stream => {
             const venId = stream.peerId;
             document.getElementById(venId).srcObject = stream;
@@ -98,6 +107,12 @@ async function startConf(){
             // 配信要請関連
             // 自会場がメインとして配信された場合以外はMuteにする
             switch (data.type) {
+                case 'initial-check':
+                    if (data.who === self){
+                        changeParam();
+                    }
+                    break;
+                
                 case 'all-main':
                     localStream.getAudioTracks()[0].enabled = true;
                     break;
@@ -106,10 +121,13 @@ async function startConf(){
                     if (data.info.venue !== currentVenue) {
                         currentVenue = data.info.venue;
                         if (self === data.info.venue) {
-                            broadcasting = true;
-                            localStream.getAudioTracks()[0].enabled = true;
+                            broadcastBtn.click();
+                            // broadcasting = true;
+                            // localStream.getAudioTracks()[0].enabled = true;
                         } else {
-                            broadcasting = false;
+                            if (broadcasting) {
+                                broadcastBtn.click();
+                            }
                         }
                     }
 
@@ -128,50 +146,54 @@ async function startConf(){
             }
         })
 
-    });
-
-    // スクリーン共有
-    shareScrBtn.addEventListener('click', async () => {
-        console.log('sharing')
-        navigator.mediaDevices.getDisplayMedia({ video: true, audio: true }).then( async scrStream => {
-            const main_ = main;
-            // const aud_ = currentOriLang === 'L1' ? aud : aud2;
-            const combinedStream = new MediaStream(
-                [...scrStream.getTracks(), ...localAudio.getTracks()]
-            )
-            
-            // 成功時にvideo要素にカメラ映像をセットし、再生
-            localVideo.srcObject = combinedStream;
-            await localVideo.play().then(()=> {
-                main_.replaceStream(combinedStream);
-                screanStream = combinedStream;
-            }).catch(console.error);
-            
-            scrStream.getVideoTracks()[0].onended = async () => {
-                localStream = await getMediaStream({video: true, audio: true});
-                localVideo.srcObject = localStream;
-                main_.replaceStream(localStream);
-                scrStream = null;
-            };
-
-            broadcastBtn.addEventListener('click', () => {
-                if (!broadcasting) {
-                    currentVenue = self;
-                    broadcasting = true;
-                    broadcastBtn.innerText = 'BROADCASTING NOW...';
-                    broadcastBtn.classList.add('is-danger');
-                    broadcastBtn.classList.remove('is-primary');
-                    changeParam();
-                } else {
-                    currentVenue = 'venue0';
-                    broadcasting = false;
-                    broadcastBtn.innerText = 'BROADCAST';
-                    broadcastBtn.classList.add('is-primary');
-                    broadcastBtn.classList.remove('is-danger');
-                    changeParam();
-                }
+        // スクリーン共有
+        shareScrBtn.addEventListener('click', async () => {
+            console.log('sharing')
+            navigator.mediaDevices.getDisplayMedia({ video: true, audio: true }).then( async scrStream => {
+                const main_ = main;
+                // const aud_ = currentOriLang === 'L1' ? aud : aud2;
+                const combinedStream = new MediaStream(
+                    [...scrStream.getTracks(), ...localAudio.getTracks()]
+                )
+                
+                // 成功時にvideo要素にカメラ映像をセットし、再生
+                localVideo.srcObject = combinedStream;
+                await localVideo.play().then(()=> {
+                    main_.replaceStream(combinedStream);
+                    screanStream = combinedStream;
+                }).catch(console.error);
+                
+                scrStream.getVideoTracks()[0].onended = async () => {
+                    localStream = await getMediaStream({video: true, audio: true});
+                    localVideo.srcObject = localStream;
+                    main_.replaceStream(localStream);
+                    scrStream = null;
+                };
             });
         });
+        
+        broadcastBtn.addEventListener('click', ev => {
+            if (!broadcasting) {
+                if (ev.isTrusted !== true){
+                    currentVenue = self;
+                    changeParam();
+                }
+                broadcasting = true;
+                broadcastBtn.innerText = 'BROADCASTING NOW...';
+                broadcastBtn.classList.add('is-danger');
+                broadcastBtn.classList.remove('is-primary');
+            } else {
+                if (ev.isTrusted !== true){
+                    currentVenue = 'venue0';
+                    changeParam();
+                }
+                broadcasting = false;
+                broadcastBtn.innerText = 'BROADCAST';
+                broadcastBtn.classList.add('is-primary');
+                broadcastBtn.classList.remove('is-danger');
+            }
+        });
+
     });
 };
 

@@ -82,7 +82,7 @@ async function startConf(){
                 to: self,
             })
             myTurn = true;
-            getTurn(myTurn);
+            getTurn();
         });
 
         const rejectHandle = () => {
@@ -151,22 +151,19 @@ async function startConf(){
         });
 
         ip.on('open', () => {
-            // 先に通訳者がいた場合、後から入った方のページではマイクをOFFにする
-            let hasHost = false
-            for (const m of ip.members) {
-                if (m.startsWith('ip')) {
-                    ips.push(m);
-                } else if (m === 'host') {
-                    hasHost = true
-                }
+            if (ip.members > 0) {
+                ip.send({
+                    type: 'initial-check',
+                    who: ip.members[0],
+                })
+                ip.members.map(val => {
+                    if (val !== 'host') {
+                        ips.push(val);
+                    };
+                });
             }
-            ips.sort();
-            if (!hasHost) {
-                if (ips.length === 1) {
-                    myTurn = true;
-                }
-                getTurn(myTurn);
-            }
+            myTurn = ips.length === 1? true : false;
+            getTurn()
         });
 
         ip.on('stream', async stream => {
@@ -179,30 +176,29 @@ async function startConf(){
         // 他の通訳が参加したことを検知する
         ip.on('peerJoin', peerId => {
             if (peerId.startsWith('ip')) {
-                msg.innerText = updateDisplayText(msgs, `Other Interpreter Joined: ${peerId}`, 20);
+                // msg.innerText = updateDisplayText(msgs, `Other Interpreter Joined: ${peerId}`, 20);
+                msg.innerHTML = coloredLog(msgs, `Other Interpreter Joined: ${peerId}`, 20, 'bg-yellow');
                 ips.push(peerId);
                 ips.sort();
             }
-            getTurn(myTurn);
+            getTurn();
         });
 
         // 接続が減った場合の処理
         ip.on('peerLeave', peerId => {
             if (peerId.startsWith('ip')) {
-                console.log(`Interpreter Left: ${peerId}`);
+                msg.innerHTML = coloredLog(msgs, `Other Interpreter Left: ${peerId}`, 20, 'bg-yellow');
                 ips = ips.filter(val => {
                     return val !== peerId;
                 });
                 ips.sort();
-                console.log(ips)
                 if (peerId === currentIp) {
                     currentIp = ips[0];
-                    console.log(currentIp);
                     if (currentIp === self) {
                         myTurn = true;
                     }
                 }
-                getTurn(myTurn);
+                getTurn();
             }
         });
 
@@ -210,9 +206,14 @@ async function startConf(){
         ip.on('data', ({src, data}) => {
             console.log(data);
             switch (data.type) {
-                
+                case 'initial-check':
+                    if (data.who === self){
+                        changeParam();
+                    }
+                    break;
+
                 case 'msg':
-                    msg.innerText = updateDisplayText(msgs, data.info, 20);
+                    msg.innerHTML = coloredLog(msgs, data.info.text, 20, data.info.color);
                     break;
                 
                 case 'change-params':
@@ -243,7 +244,7 @@ async function startConf(){
                     } else {
                         myTurn = false;
                     }
-                    getTurn(myTurn);
+                    getTurn();
                     break;
 
                 case 'hand-over':
@@ -255,7 +256,7 @@ async function startConf(){
 
                 case 'hand-accept':
                     myTurn = false;
-                    getTurn(myTurn);
+                    getTurn();
                     handOverBtn.innerText = 'HAND OVER';
                     handOverBtn.classList.add('is-black');
                     handOverBtn.classList.remove('is-white');
@@ -273,26 +274,23 @@ async function startConf(){
             }
         });
 
-        sendMsg.addEventListener('keyup', () => {
-            if (ev.keyCode === 13) {
-                const text = document.getElementById('sendMsg').value;
-                msg.innerText = updateDisplayText(msgs, text, 20);
-                ip.send({
-                    type: 'msg',
-                    info: text,
-                });
-                document.getElementById('sendMsg').value = '';
-            }
-        });
-
         sendMsgBtn.addEventListener('click', () => {
             const text = document.getElementById('sendMsg').value;
-            msg.innerText = updateDisplayText(msgs, text, 20);
+            // msg.innerText = updateDisplayText(msgs, text, 20);
+            msg.innerHTML = coloredLog(msgs, text, 20);
             ip.send({
                 type: 'msg',
-                info: text,
+                info: {
+                    text
+                },
             });
             document.getElementById('sendMsg').value = '';
+        });
+
+        sendMsg.addEventListener('keyup', ev => {
+            if (ev.keyCode === 13) {
+                sendMsgBtn.click();
+            }
         });
 
         handOverBtn.addEventListener('click', () => {
@@ -315,7 +313,7 @@ async function startConf(){
         ipMute = true;
         localAudio.getAudioTracks()[0].enabled = false;
         muteBtn.classList.add('is-danger');
-        msg.innerText = updateDisplayText(msgs, '@host speaking', 20);
+        // msg.innerText = updateDisplayText(msgs, '@host speaking', 20);
     };
 
     const setOriL1 = () => {
@@ -325,7 +323,7 @@ async function startConf(){
         muteBtn.classList.remove('is-danger');
         setLang1Btn.classList.remove('is-primary');
         setLang2Btn.classList.add('is-primary');
-        msg.innerText = updateDisplayText(msgs, 'lang toggled by @host', 20);
+        // msg.innerText = updateDisplayText(msgs, 'lang toggled by @host', 20);
     };
 
     const setOriL2 = () => {
@@ -335,12 +333,12 @@ async function startConf(){
         muteBtn.classList.remove('is-danger');
         setLang1Btn.classList.add('is-primary');
         setLang2Btn.classList.remove('is-primary');
-        msg.innerText = updateDisplayText(msgs, 'lang toggled by @host', 20);
+        // msg.innerText = updateDisplayText(msgs, 'lang toggled by @host', 20);
     };
 
-    const getTurn = (turn) => {
-        console.log(turn)
-        if (turn) {
+    const getTurn = () => {
+        console.log(myTurn)
+        if (myTurn) {
             unmuting();
             setLang1Btn.disabled = false;
             setLang2Btn.disabled = false;

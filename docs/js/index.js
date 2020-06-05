@@ -3,8 +3,22 @@ const mconf = {
     lang2Name: 'Chinese',
 }
 
-function updateDisplayText(oldTexts, newText, limit) {
+const cv = document.createElement('canvas');
+
+function updateDisplayText(oldTexts, newText, fontClass, limit) {
     oldTexts.push(newText.trim());
+    if (oldTexts.length >= limit) {
+        oldTexts.shift();
+    }
+    return oldTexts.join('\n');
+}
+
+function coloredLog(oldTexts, newText, limit, fontClass) {
+    let text = newText.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    if (fontClass !== undefined) {
+        text = `<span class="${fontClass}">${text}</span>`;
+    }
+    oldTexts.push(text.trim());
     if (oldTexts.length >= limit) {
         oldTexts.shift();
     }
@@ -41,12 +55,13 @@ async function getMediaStream(getters) {
             };
             navigator.mediaDevices.getUserMedia(getMedia).then(stream => {
                 if (getters.video && !foundCamera) {
-                    const mockVideo = document.createElement('canvas').captureStream(10);
-                    console.log(mockVideo);
+                    // const canvas = document.createElement('canvas');
+                    const cxt = cv.getContext('2d');
+                    cxt.font = `20px 'Arial'`
+                    cxt.fillText('No Camera...', 10, 30);
                     const mockStream = new MediaStream(
-                        [...mockVideo.getVideoTracks(), ...stream.getAudioTracks()]
+                        [...canvas.captureStream(10), ...stream.getAudioTracks()]
                     );
-                    console.log(mockStream.getTracks())
                     resolve(mockStream);
                 } else {
                     resolve(stream);
