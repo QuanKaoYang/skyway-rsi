@@ -34,6 +34,13 @@ async function startConf() {
     const msg = document.getElementById('msg')
     const sendMsgBtn = document.getElementById('sendMsg-btn')
 
+    // 最初の接続を行う
+    document.getElementById('password').addEventListener('keyup', ev => {
+        if (ev.keyCode === 13) {
+            document.getElementById('login-btn').click();
+        }
+    })
+
     document.getElementById('login-btn').addEventListener('click', () => {
         const name = document.getElementById('name').value;
         // const user = document.getElementById('user').value;
