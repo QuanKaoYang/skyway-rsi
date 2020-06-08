@@ -25,16 +25,36 @@ function coloredLog(oldTexts, newText, limit, fontClass) {
     return oldTexts.join('\n');
 }
 
-async function getSkyKey(key) {
-    return new Promise(resolve => {
-        fetch(`https://sheepy-meme.builtwithdark.com/skylogin?key=${key}`).then(res => {
-            if (res.status === 200) {
-                res.text().then(t => {
-                    resolve(t);
-                })
+// async function getSkyKey(key) {
+//     return new Promise(resolve => {
+//         fetch(`https://sheepy-meme.builtwithdark.com/skylogin?key=${key}`).then(res => {
+//             if (res.status === 200) {
+//                 res.text().then(t => {
+//                     resolve(t);
+//                 })
+//             }
+//         })
+//     })
+// }
+
+async function confirmInputDevices() {
+    let foundAudio = false;
+    let foundCamera = false;
+    return new Promise((resolve, reject) => {
+        navigator.mediaDevices.enumerateDevices().then(devs => {
+            for (const dev of devs) {
+                if (dev.kind === 'audioinput') {
+                    foundAudio = true;
+                } else if (dev.kind === 'videoinput') {
+                    foundCamera = true;
+                }
             }
-        })
-    })
+            resolve({foundAudio, foundCamera})
+        }).catch(() => {
+            console.log('Get Devices failed');
+            reject('Get Devices failed');
+        });
+    });
 }
 
 async function login(data) {

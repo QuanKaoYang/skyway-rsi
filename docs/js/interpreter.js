@@ -394,6 +394,13 @@ async function startConf(){
 
 (async function(){
     console.log('start');
-    startConf();
+    const devs = await confirmInputDevices();
+    if (devs.foundAudio) {
+        document.getElementById('login-btn').disabled = false;
+        startConf();
+    } else {
+        document.getElementById('login-msg').innerText = 'Interpreter needs at least 1 auidio input(microphone)...'
+    }
+    
 })();
 
