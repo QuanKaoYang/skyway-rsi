@@ -400,7 +400,6 @@ async function startConf(){
         startConf();
     } else {
         document.getElementById('login-msg').innerText = 'Interpreter needs at least 1 auidio input(microphone)...'
-    }
-    
+    }    
 })();
 
